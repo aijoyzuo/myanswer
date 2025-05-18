@@ -1,3 +1,15 @@
 .object-cover{
     object-fit:cover;
 }
+
+/* 原本的位置 */
+.brand-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: top 0.3s ease;
+}
+
+.navbar-toggler[aria-expanded="true"] ~ .container .brand-center {
+  top: 20%;}

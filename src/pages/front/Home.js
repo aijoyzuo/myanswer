@@ -65,9 +65,9 @@ export default function Home() {
                 </div>
                 <div className="col-md-5 d-flex flex-column justify-content-center mt-md-0 mt-3">
                     <h2 className="fw-bold">ANSWER</h2>
-                    <h6 className="font-weight-normal text-muted mt-2">
+                    <p className="h6 font-weight-normal text-muted mt-2">
                         提供安心專業的肌膚管理產品與肌管諮詢，在舒適放鬆的環境，享受最有效率的保養。
-                    </h6>
+                    </p>
                 </div>
             </div>
         </div>
