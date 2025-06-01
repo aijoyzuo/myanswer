@@ -63,69 +63,76 @@ export default function Cart() {
                                 onChange={(e) => setCouponCode(e.target.value)} />
                         </div>
                         <div className="col-md-5">
-                            <button className="btn btn-dark btn-block rounded-0 py-3 w-100" type="button" onClick={applyCoupon}>輸入優惠碼</button>
+                            <button className="btn btn-dark btn-block rounded-0 py-3 w-100" type="button" onClick={applyCoupon} disabled={!couponCode}>輸入優惠碼</button>
                         </div>
                     </div>
-                    {cartData?.carts?.map((item) => {
-                        return (
-                            <div className="d-flex mt-4 bg-light" key={item.id}>
-                                <img src={item.product.imageUrl} alt="" style={{ width: "120px" }} className="object-cover" />
-                                <div className="w-100 p-3 position-relative">
-                                    <button
-                                        type="button"
-                                        className="position-absolute btn"
-                                        style={{ top: "12px", right: "16px", }}
-                                        onClick={() => removeCartItem(item.id)}>
-                                        <i className="bi bi-x"></i></button>
-                                    <p className="mb-0 fw-bold">{item.product.title}</p>
-                                    <p className="mb-1 text-muted" style={{ fontSize: "14px" }}>{item.product.description}</p>
-                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                        <div className="input-group w-50 align-items-center">
-                                            <select name="" className="form-select" id=""
-                                                value={item.qty}//select 的選中項目會依照 item.qty 自動顯示目前數量
-                                                disabled={loadingItems.includes(item.id)}
-                                                onChange={
-                                                    (e) => {
-                                                        updateCartItem(item, e.target.value * 1); //因為下拉選單的型別會是字串，所以寫一個*1將它變成數字。改變選項時會觸發 onChange，透過 e.target.value 取得選擇的數字
+                    {cartData?.carts?.length > 0 ? (<>
+                        {cartData?.carts?.map((item) => {
+                            return (
+                                <div className="d-flex mt-4 bg-light" key={item.id}>
+                                    <img src={item.product.imageUrl} alt="" style={{ width: "120px" }} className="object-cover" />
+                                    <div className="w-100 p-3 position-relative">
+                                        <button
+                                            type="button"
+                                            className="position-absolute btn"
+                                            style={{ top: "12px", right: "16px", }}
+                                            onClick={() => removeCartItem(item.id)}>
+                                            <i className="bi bi-x"></i></button>
+                                        <p className="mb-0 fw-bold">{item.product.title}</p>
+                                        <p className="mb-1 text-muted" style={{ fontSize: "14px" }}>{item.product.description}</p>
+                                        <div className="d-flex justify-content-between align-items-center w-100">
+                                            <div className="input-group w-50 align-items-center">
+                                                <select name="" className="form-select" id=""
+                                                    value={item.qty}//select 的選中項目會依照 item.qty 自動顯示目前數量
+                                                    disabled={loadingItems.includes(item.id)}
+                                                    onChange={
+                                                        (e) => {
+                                                            updateCartItem(item, e.target.value * 1); //因為下拉選單的型別會是字串，所以寫一個*1將它變成數字。改變選項時會觸發 onChange，透過 e.target.value 取得選擇的數字
+                                                        }
+                                                    }>
+                                                    {
+                                                        [...(new Array(20))].map((i, num) => {
+                                                            return (
+                                                                <option value={num + 1} key={num}>{num + 1}</option>
+                                                            )
+                                                        })
                                                     }
-                                                }>
-                                                {
-                                                    [...(new Array(20))].map((i, num) => {
-                                                        return (
-                                                            <option value={num + 1} key={num}>{num + 1}</option>
-                                                        )
-                                                    })
-                                                }
-                                            </select>
+                                                </select>
+                                            </div>
+                                            <p className="mb-0 ms-auto">NT${item.total}</p>
                                         </div>
-                                        <p className="mb-0 ms-auto">NT${item.total}</p>
                                     </div>
                                 </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
 
-                    <table className="table mt-4 text-muted">
-                        <tbody>
-                            <tr>
-                                <th scope="row" className="border-0 px-0 font-weight-normal">小計</th>
-                                <td className="text-end border-0 px-0">NT$ {cartData.total}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">套用優惠券</th>
-                                <td className="text-end border-0 px-0 pt-0">-NT${cartData.total - cartData.final_total}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">運費</th>
-                                <td className="text-end border-0 px-0 pt-0">+NT$160</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div className="d-flex justify-content-between mt-4">
-                        <p className="mb-0 h4 fw-bold">結帳總金額</p>
-                        <p className="mb-0 h4 fw-bold">NT${Math.ceil(cartData.final_total+160)}</p>
-                    </div>
-                    <Link to="../checkout" className="btn btn-dark btn-block mt-4 rounded-0 py-3 w-100">確認明細</Link>
+                        <table className="table mt-4 text-muted">
+                            <tbody>
+                                <tr>
+                                    <th scope="row" className="border-0 px-0 font-weight-normal">小計</th>
+                                    <td className="text-end border-0 px-0">NT$ {cartData.total}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">套用優惠券</th>
+                                    <td className="text-end border-0 px-0 pt-0">-NT${cartData.total - cartData.final_total}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">運費</th>
+                                    <td className="text-end border-0 px-0 pt-0">+NT$160</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div className="d-flex justify-content-between mt-4">
+                            <p className="mb-0 h4 fw-bold">結帳總金額</p>
+                            <p className="mb-0 h4 fw-bold">NT${Math.ceil(cartData.final_total + 160)}</p>
+                        </div>
+                        <Link to="../checkout" className="btn btn-dark btn-block mt-4 rounded-0 py-3 w-100">確認明細</Link></>)
+                        : (<div className="text-center mt-5">
+                            <h4 className="mb-3">目前購物車是空的</h4>
+                            <Link to="/products" className="btn btn-dark btn-block mt-4 rounded-0 py-3 px-5">
+                                前往選購商品
+                            </Link>
+                        </div>)}
                 </div>
             </div>
         </div >

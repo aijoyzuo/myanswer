@@ -65,7 +65,7 @@ export default function WishList() {
                         {products.map((product) => (
                             <div className="col-md-3" key={product.id}>
                                 <div className="card border-0 h-100 position-relative">
-                                    <img src={product.imageUrl} alt="" className="card-img-top" style={{ height: 200, objectFit: 'cover' }} />
+                                    <img src={product.imageUrl} alt="" className="card-img-top wishlist-img"  />
                                     <div className="card-body d-flex flex-column text-center">
                                         <h5>{product.title}</h5>
                                         <p className="text-muted">{product.category}</p>

@@ -1,11 +1,11 @@
-export default function Carousel({ isActive, img, text, author}) {
+export default function Carousel({ isActive, img, text, author,alt}) {
     return (<>
         <div className={`carousel-item ${isActive ? 'active' : ''}`}>
             <div className="row justify-content-center py-7">
                 <div className="col-md-8 d-flex">
                     <img 
                     src={img}
-                    alt="" 
+                    alt={alt}
                     className="rounded-circle me-5" 
                     style={{ width: '160px', height: '160px', objectFit: 'cover', }} />
                     <div className="d-flex flex-column">

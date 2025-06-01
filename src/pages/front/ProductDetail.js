@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useOutletContext, useParams, Link } from 'react-router-dom';
 import ImageSwiper from '../../components/ImageSwiper';
 
 export default function ProductDetail() {
@@ -10,11 +10,28 @@ export default function ProductDetail() {
     const { id } = useParams();//使用useParams抓取網址上的參數，並從中解構出id這個參數，回傳一個物件{id: "-OPOSldtpZ6IAwfukmCw"}，我再將物件中的id變成變數
     const [isLoading, setIsLoading] = useState(false);
     const { getCart } = useOutletContext();//外層傳進來的功能
+    const [relatedProducts, setRelatedProducts] = useState([]);//推薦猜你也喜歡
 
     const getProduct = async () => {
         const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/product/${id}`);
-        //console.log(productRes);
+        const fetchedProduct = productRes.data.product;//因為我「根據 category 推薦相關產品」，所以要先從 API 回傳的 product 中抓出完整資料（尤其是 category）來用。
         setProduct(productRes.data.product);
+        getRelatedProducts(fetchedProduct.category, fetchedProduct.id);//1過濾出「相同分類」的產品，2用來排除「就是這個產品自己」的資料
+    };
+
+    const getRelatedProducts = async (category, currentProductId) => {//推薦猜你喜歡
+        try {
+            const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/products/all`);
+            const allProducts = res.data.products;
+
+            const related = allProducts// 過濾相同分類但不是當前產品的項目，最多三個
+                .filter(p => p.category === category && p.id !== currentProductId)
+                .slice(0, 3);
+
+            setRelatedProducts(related);
+        } catch (err) {
+            console.log("取得相關產品失敗", err);
+        }
     };
 
     const addToCart = async () => {
@@ -39,8 +56,13 @@ export default function ProductDetail() {
     }
 
     useEffect(() => {
+        const scrollTop = window.innerWidth >= 768 ? 140 : 0;
+        window.scrollTo({ top: scrollTop, behavior: 'smooth' });//每次id變更時捲動到距離上方140px的位置
         getProduct(id);
     }, [id])
+
+
+
 
     return (<>
         <div className="container">
@@ -66,14 +88,14 @@ export default function ProductDetail() {
                             objectPosition: "bottom",
                             position: "relative",
                         }}
-                            onError={() => setShowFallback(true)} // 關鍵：出錯時切換
+                            onError={() => setShowFallback(true)} // 關鍵：出錯時切換。打包時要使用相對路徑。
                         >
-                            <source src="/video.mp4" type="video/mp4" />
+                            <source src={`${process.env.PUBLIC_URL}/video.mp4`} type="video/mp4" />
                         </video>
 
                     ) :
                         (<img
-                            src="/fallback.png"
+                            src={`${process.env.PUBLIC_URL}/fallback.png`}
                             alt="影片無法播放，顯示替代圖片"
                             className="w-100"
                             style={{
@@ -108,13 +130,14 @@ export default function ProductDetail() {
 
                     <h2 className="mb-0">{product.title}</h2>
                     <p className="fw-bold">NT${product.price}</p>
+                    <p className="text-muted mb-0">品牌： {product.category}</p>
                     <p>{product.description}</p>
                     <div className="accordion border border-bottom border-top-0 border-start-0 border-end-0 mb-3" id="accordionExample">
                         <div className="card border-0">
                             <div className="card-header py-4 bg-white border border-bottom-0 border-top border-start-0 border-end-0" id="headingOne" data-bs-toggle="collapse" data-bs-target="#collapseOne">
                                 <div className="d-flex justify-content-between align-items-center pe-1">
                                     <h4 className="mb-0">
-                                        {product.title}的內容物
+                                        成分及使用方法說明
                                     </h4>
                                     <i className="fas fa-minus"></i>
                                 </div>
@@ -125,21 +148,45 @@ export default function ProductDetail() {
                                 </div>
                             </div>
                         </div>
-
                     </div>
+                    <div className="card border-0">
+                        {relatedProducts.length > 0 && (
+                            <div className="mt-1">
+                                <h4 className="mb-2">猜你也會喜歡</h4>
+                                <div className="row">
+                                    {relatedProducts.map((item) => (
+                                        <div className="col-4" key={item.id}>
+                                            <Link to={`/product/${item.id}`} className="text-decoration-none" >
+                                                <div className="card h-100 border-0 text-center position-relative" style={{ height: "150px", width: "150px" }}>
+                                                    <img src={item.imageUrl} className="card-img-top" alt={item.title} />
+                                                    <div className="card-body p-2">
+                                                        <h6 className="card-title text-truncate mb-0">{item.title}</h6>
+                                                        <p className="card-text mb-1 text-muted">{item.category}</p>
+                                                        <p className="card-text text-muted">NT${item.price}</p>
+                                                        <span className="stretched-link"></span> {/*父層position-relative+這行，讓整張卡片都可以點擊*/}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                 </div>
+
+
                 <div className="col-md-4">
                     <div className="input-group mb-3 border mt-3">
-                        <div className="input-group-prepend">
-                            <button
-                                className="btn btn-outline-dark rounded-0 border-0 py-3"
-                                type="button"
-                                id="button-addon1"
-                                onClick={() => setCartQuantity((pre) => pre === 1 ? pre : pre - 1)}
-                            >
-                                <i className="bi bi-dash"></i>
-                            </button>
-                        </div>
+                        <button
+                            className="btn btn-outline-dark rounded-0 border-0 py-3"
+                            type="button"
+                            id="button-addon1"
+                            onClick={() => setCartQuantity((pre) => pre === 1 ? pre : pre - 1)}
+                        >
+                            <i className="bi bi-dash"></i>
+                        </button>
                         <input
                             type="number"
                             className="form-control border-0 text-center my-auto shadow-none"
@@ -148,15 +195,13 @@ export default function ProductDetail() {
                             aria-describedby="button-addon1"
                             value={cartQuantity}
                             readOnly />
-                        <div className="input-group-append">
-                            <button className="btn btn-outline-dark rounded-0 border-0 py-3"
-                                type="button"
-                                id="button-addon2"
-                                onClick={() => setCartQuantity((pre) => pre + 1)}
-                            >
-                                <i className="bi bi-plus"></i>
-                            </button>
-                        </div>
+                        <button className="btn btn-outline-dark rounded-0 border-0 py-3"
+                            type="button"
+                            id="button-addon2"
+                            onClick={() => setCartQuantity((pre) => pre + 1)}
+                        >
+                            <i className="bi bi-plus"></i>
+                        </button>
                     </div>
                     <button type="button" className="btn btn-primary text-white btn-block rounded-0 py-3 w-100"
                         onClick={() => addToCart()}

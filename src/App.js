@@ -15,6 +15,7 @@ import Cart from './pages/front/Cart';
 import Checkout from './pages/front/Checkout';
 import Success from './pages/front/Success';
 import WishList from './pages/front/WishList';
+import Services from './pages/front/Services';
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
           <Route path='' element={<Home />}></Route>
           <Route path='products' element={<Products />}></Route>
           <Route path='product/:id' element={<ProductDetail />}></Route> 
+          <Route path='services' element={<Services />}></Route>
           <Route path='cart' element={<Cart />}></Route> 
           <Route path='checkout' element={<Checkout />}></Route>
           <Route path='success/:orderId' element={<Success />}></Route>
