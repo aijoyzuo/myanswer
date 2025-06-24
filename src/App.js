@@ -1,6 +1,9 @@
 import './assets/all.scss';
+<<<<<<< HEAD
 import { useEffect } from 'react';
 import axios from 'axios';
+=======
+>>>>>>> 2ee4b1f (Initial commit)
 import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
