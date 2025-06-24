@@ -23,7 +23,7 @@ import Services from './pages/front/Services';
 function App() {
 
   return (
-    <div className="App">
+    <div className="App1">
       <Routes>
         <Route path='/' element={<FrontLayout />}>
           <Route path='' element={<Home />}></Route>
