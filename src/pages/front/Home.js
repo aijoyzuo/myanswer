@@ -36,7 +36,7 @@ export default function Home() {
   useEffect(() => {
     const carouselEl = document.querySelector('#carouselExampleControls');
     if (carouselEl) {
-      const carouselInstance = new Carousel(carouselEl, {
+      new Carousel(carouselEl, {
         interval: 2000,
         ride: 'carousel',
         wrap: true,
