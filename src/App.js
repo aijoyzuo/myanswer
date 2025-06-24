@@ -1,9 +1,4 @@
 import './assets/all.scss';
-<<<<<<< HEAD
-import { useEffect } from 'react';
-import axios from 'axios';
-=======
->>>>>>> 2ee4b1f (Initial commit)
 import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -23,7 +18,7 @@ import Services from './pages/front/Services';
 function App() {
 
   return (
-    <div className="App1">
+    <div>
       <Routes>
         <Route path='/' element={<FrontLayout />}>
           <Route path='' element={<Home />}></Route>
@@ -42,7 +37,6 @@ function App() {
           <Route path='orders' element={<AdminOrders />}></Route>
         </Route>
       </Routes>
-
     </div>
   );
 }

@@ -6,13 +6,12 @@ import { useLocation } from "react-router-dom"; //運費
 export default function Success() {
     const { orderId } = useParams();//從網址的路由參數中，取得 orderId 的值，並存到變數 orderId。(它會回傳一個物件{orderId: (路由上的值)}
     const location = useLocation(); //接收運費
-    const shipping = location.state?.shipping || 160; // ← 運費預設值為 160
+    
 
     const [orderData, setOrderData] = useState({});
 
     const getCart = async (orderId) => {
         const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/order/${orderId}`);
-        console.log(res);
         setOrderData(res.data.order);
     }
 

@@ -7,45 +7,45 @@ import { WishListProvider } from "../../store/wishListContext";
 
 
 export default function FrontLayout() {
-    const [cartData, setCartData] = useState({}); //取得購物車資訊
+  const [cartData, setCartData] = useState({}); //取得購物車資訊
 
-    const getCart = async () => {
-        try {
-            const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/cart`,);
-            console.log('購物車內容', res);
+  const getCart = async () => {
+    try {
+      const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/cart`,);
 
-            const rawData = res.data.data; // 處理優惠券打折後進位的問題 final_total
-            const cleanedData = {
-                ...rawData,
-                final_total: Math.ceil(rawData.final_total),
-            };
 
-            setCartData(cleanedData); // 提供給所有頁面使用
-        } catch (error) {
-            console.log(error)
-        }
+      const rawData = res.data.data; // 處理優惠券打折後進位的問題 final_total
+      const cleanedData = {
+        ...rawData,
+        final_total: Math.ceil(rawData.final_total),
+      };
+
+      setCartData(cleanedData); // 提供給所有頁面使用
+    } catch (error) {
+      console.log(error)
     }
+  }
 
-    useEffect(() => {
-        getCart();
-    }, [])
+  useEffect(() => {
+    getCart();
+  }, [])
 
-    return (<>
-        <WishListProvider>
-            <Navbar cartData={cartData}></Navbar>
-            <Outlet context={{ getCart, cartData }}></Outlet>
-            <div className="bg-dark">
-                <div className="container">
-                    <div className="d-flex align-items-center justify-content-between text-white py-4">
-                        <p className="mb-0">© 2025 ANSWER All Rights Reserved.</p>
-                        <ul className="d-flex list-unstyled mb-0 h4">
-                            <li><a href="#" className="text-white mx-3"><i className="fab fa-facebook"></i></a></li>
-                            <li><a href="#" className="text-white mx-3"><i className="fab fa-instagram"></i></a></li>
-                            <li><a href="#" className="text-white ms-3"><i className="fab fa-line"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </WishListProvider>
-    </>)
+  return (<>
+    <WishListProvider>
+      <Navbar cartData={cartData}></Navbar>
+      <Outlet context={{ getCart, cartData }}></Outlet>
+      <div className="bg-dark">
+        <div className="container">
+          <div className="d-flex align-items-center justify-content-between text-white py-4">
+            <p className="mb-0">© 2025 ANSWER All Rights Reserved.</p>
+            <ul className="d-flex list-unstyled mb-0 h4">
+              <li><a href="#" className="text-white mx-3"><i className="fab fa-facebook"></i></a></li>
+              <li><a href="#" className="text-white mx-3"><i className="fab fa-instagram"></i></a></li>
+              <li><a href="#" className="text-white ms-3"><i className="fab fa-line"></i></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </WishListProvider>
+  </>)
 }

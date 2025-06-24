@@ -5,28 +5,28 @@ import { createContext, useState, useContext, useEffect } from 'react';
 const WishListContext = createContext();
 
 export const WishListProvider = ({ children }) => {
-    const [wishList, setWishList] = useState(() => {
-        const stored = localStorage.getItem('wishList');
-        return stored ? JSON.parse(stored) : [];
-    });
+  const [wishList, setWishList] = useState(() => {
+    const stored = localStorage.getItem('wishList');
+    return stored ? JSON.parse(stored) : [];
+  });
 
-    useEffect(() => {
-        localStorage.setItem('wishList', JSON.stringify(wishList));
-    }, [wishList]);
+  useEffect(() => {
+    localStorage.setItem('wishList', JSON.stringify(wishList));
+  }, [wishList]);
 
-    const toggleWish = (productId) => {
-        setWishList((prev) =>
-            prev.includes(productId)
-                ? prev.filter((id) => id !== productId)
-                : [...prev, productId]
-        );
-    };
-
-    return (
-        <WishListContext.Provider value={{ wishList, toggleWish }}>
-            {children}
-        </WishListContext.Provider>
+  const toggleWish = (productId) => {
+    setWishList((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
     );
+  };
+
+  return (
+    <WishListContext.Provider value={{ wishList, toggleWish }}>
+      {children}
+    </WishListContext.Provider>
+  );
 };
 
 export const useWishList = () => useContext(WishListContext);
