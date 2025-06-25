@@ -7,6 +7,7 @@ export default function Cart() {
   const { cartData, getCart } = useOutletContext(); //用useOutletContext方法從frontlayout取得cartData
   const [loadingItems, setLoadingItems] = useState([]);
   const [couponCode, setCouponCode] = useState("");//套用優惠券
+  const SHIPPING_FEE = 160;//定義運費
 
   const removeCartItem = async (id) => {
     try {
@@ -115,7 +116,7 @@ export default function Cart() {
                 </tr>
                 <tr>
                   <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">運費</th>
-                  <td className="text-end border-0 px-0 pt-0">+NT$160</td>
+                  <td className="text-end border-0 px-0 pt-0">+NT${SHIPPING_FEE}</td>
                 </tr>
               </tbody>
             </table>

@@ -85,9 +85,9 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
-            <h1 className="modal-title fs-5" id="exampleModalLabel">
+            <h2 className="modal-title fs-5" id="exampleModalLabel">
               {type === 'create' ? '建立新優惠券' : `編輯${tempData.title}`}
-            </h1>
+            </h2>
             <button type="button" className="btn-close" aria-label="Close" onClick={closeModal}></button>
             {/*把data-bs-dismiss改成onClick={closeModal} */}
           </div>
