@@ -61,9 +61,9 @@ export default function OrderModal({ closeProductModal, getOrders, tempOrder }) 
       <div className='modal-dialog modal-lg'>
         <div className='modal-content'>
           <div className='modal-header'>
-            <h1 className='modal-title fs-5' id='exampleModalLabel'>
+            <h2 className='modal-title fs-5' id='exampleModalLabel'>
               {`編輯 ${tempData.id}`}
-            </h1>
+            </h2>
             <button
               type='button'
               className='btn-close'

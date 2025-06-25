@@ -113,9 +113,9 @@ export default function ProductModal({ closeProducModal, getProducts, type, temp
         <div className="modal-dialog modal-lg">
           <div className="modal-content">
             <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
+              <h2 className="modal-title fs-5" id="exampleModalLabel">
                 {type === 'create' ? '建立新商品' : `編輯${tempData.title}`}
-              </h1>
+              </h2>
               <button type="button" className="btn-close" aria-label="Close" onClick={closeProducModal}></button>
               {/*把data-bs-dismiss改成onClick={closeProducModal} */}
             </div>
