@@ -356,3 +356,4 @@ export default function ProductModal({ closeProducModal, getProducts, type, temp
 
 
 
+}
