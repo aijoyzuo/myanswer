@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../store/messageStore";
 
 
-export default function ProductModal({ closeProducModal, getProducts, type, tempProduct }) {
+export default function ProductModal({ closeProductModal, getProducts, type, tempProduct }) {
   const [tempData, setTempData] = useState({
     title: "",
     category: "",
@@ -74,7 +74,7 @@ export default function ProductModal({ closeProducModal, getProducts, type, temp
         });//此api要求把資料包在一個 data 欄位裡，而tempData必須是個物件。按下submit之後，將tempData的整包資料傳給後端
 
       handleSuccessMessage(dispatch, res);
-      closeProducModal();//submit之後關閉modal
+      closeProductModal();//submit之後關閉modal
       getProducts();//並重新取得遠端資料
     } catch (error) {
       handleErrorMessage(dispatch, error);
@@ -116,8 +116,8 @@ export default function ProductModal({ closeProducModal, getProducts, type, temp
               <h2 className="modal-title fs-5" id="exampleModalLabel">
                 {type === 'create' ? '建立新商品' : `編輯${tempData.title}`}
               </h2>
-              <button type="button" className="btn-close" aria-label="Close" onClick={closeProducModal}></button>
-              {/*把data-bs-dismiss改成onClick={closeProducModal} */}
+              <button type="button" className="btn-close" aria-label="Close" onClick={closeProductModal}></button>
+              {/*把data-bs-dismiss改成onClick={closeProductModal} */}
             </div>
             <div className="modal-body">
               <div className='row'>
@@ -343,8 +343,8 @@ export default function ProductModal({ closeProducModal, getProducts, type, temp
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={closeProducModal} >關閉</button>
-              {/*把data-bs-dismiss改成onClick={closeProducModal} */}
+              <button type="button" className="btn btn-secondary" onClick={closeProductModal} >關閉</button>
+              {/*把data-bs-dismiss改成onClick={closeProductModal} */}
               <button type="button" className="btn btn-primary" onClick={submit}>儲存</button>
             </div>
           </div>
