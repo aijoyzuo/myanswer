@@ -7,15 +7,18 @@ import axios from "axios";
 
 export default function Checkout() {
   const { cartData } = useOutletContext(); //取得購物車資料
-  const [payment, setPayment] = useState('option1');//付款方式額外設定
+  const [payment, setPayment] = useState(defaultPayment);//付款方式額外設定
   const navigate = useNavigate();//submit到下一頁
+  const SHIPPING_FEE = 160;
 
 
-  const paymentOptions = { //付款方式設定物件中屬性對應的值
-    option1: 'WebATM',
-    option2: 'ATM',
-    option3: 'ApplePay',
-  };
+  const paymentOptions = [
+    { id: 'option1', label: 'WebATM' },
+    { id: 'option2', label: 'ATM' },
+    { id: 'option3', label: 'ApplePay' },
+  ];
+
+  const defaultPayment = paymentOptions[0].id; // 抓第一個 key 當預設
 
   const {  //react-hook-form的啟用
     register,
@@ -49,7 +52,7 @@ export default function Checkout() {
     try {
       const res = await axios.post(`/v2/api/${process.env.REACT_APP_API_PATH}/order`, form);
       navigate(`/success/${res.data.orderId}`, {  // 抓到回傳的 order id,把 orderId 帶到網址上
-        state: { shipping: 160 }, //把運費帶進下一頁
+        state: { shipping: SHIPPING_FEE }, //把運費帶進下一頁
       });
     } catch (error) {
       console.error('建立訂單失敗', error);
@@ -135,39 +138,21 @@ export default function Checkout() {
             </div>
             <div className="bg-white p-4 mt-3">
               <h4 className="fw-bold">付款方式</h4>
-              <div className="form-check mb-2">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="gridRadios"
-                  value="option1"
-                  checked={payment === 'option1'}
-                  onChange={(e) => setPayment(e.target.value)} />
-                <label className="form-check-label text-muted" for="gridRadios1">WebATM
-                </label>
-              </div>
-              <div className="form-check mb-2">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="gridRadios"
-                  value="option2"
-                  checked={payment === 'option2'}
-                  onChange={(e) => setPayment(e.target.value)} />
-                <label className="form-check-label text-muted" for="gridRadios2">ATM
-                </label>
-              </div>
-              <div className="form-check mb-2">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="gridRadios"
-                  value="option3"
-                  checked={payment === 'option3'}
-                  onChange={(e) => setPayment(e.target.value)} />
-                <label className="form-check-label text-muted" for="gridRadios3">ApplePay
-                </label>
-              </div>
+              {paymentOptions.map((opt) => (
+                <div className="form-check mb-2" key={opt.id}>
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="gridRadios"
+                    value={opt.id}
+                    checked={payment === opt.id}
+                    onChange={(e) => setPayment(e.target.value)}
+                  />
+                  <label className="form-check-label text-muted">
+                    {opt.label}
+                  </label>
+                </div>
+              ))}
             </div>
             <div className="bg-white px-4 py-3 mt-3">
               <p className="mt-4 mb-2">備註(非必填)</p>

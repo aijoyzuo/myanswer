@@ -38,7 +38,7 @@ export default function Cart() {
   }
 
   const applyCoupon = async () => {
-    try { 
+    try {
       getCart(); // 重新取得購物車，讓折扣更新
       alert("優惠券套用成功");
     } catch (error) {
@@ -83,11 +83,9 @@ export default function Cart() {
                         <select name="" className="form-select" id=""
                           value={item.qty}//select 的選中項目會依照 item.qty 自動顯示目前數量
                           disabled={loadingItems.includes(item.id)}
-                          onChange={
-                            (e) => {
-                              updateCartItem(item, e.target.value * 1); //因為下拉選單的型別會是字串，所以寫一個*1將它變成數字。改變選項時會觸發 onChange，透過 e.target.value 取得選擇的數字
-                            }
-                          }>
+                          onChange={(e) => {
+                            updateCartItem(item, Number(e.target.value)); // 將字串轉為數字，避免型別錯誤
+                          }}>
                           {
                             [...(new Array(20))].map((_, num) => {
                               return (
