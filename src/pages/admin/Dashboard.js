@@ -2,7 +2,7 @@ import { Outlet, useNavigate,Link} from "react-router-dom";
 import axios from "axios";
 import { useEffect, useReducer } from "react"; //useReducer要加在有Provider元件的這頁
 import Message from "../../components/Message";
-import { MessageContext,messageReducer,inistate } from "../../store/messageStore";
+import { MessageContext,messageReducer,inistate } from "../../context/messageContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();//轉址回登入畫面

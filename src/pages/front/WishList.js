@@ -1,5 +1,5 @@
 // WishList.jsx
-import { useWishList } from '../../store/wishListContext';
+import { useWishList } from '../../context/wishListContext';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';

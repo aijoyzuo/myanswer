@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useWishList } from "../store/wishListContext";
+import { useWishList } from "../context/wishListContext";
 import { useRef } from "react";
 import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
 

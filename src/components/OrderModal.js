@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../store/messageStore";
+import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../context/messageContext";
 
 
 export default function OrderModal({ closeProductModal, getOrders, tempOrder }) {

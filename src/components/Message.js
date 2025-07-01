@@ -7,7 +7,7 @@ dispatch：一個可以發送 action、改變 message 狀態的函式
 
 
 import { useContext } from "react";
-import { MessageContext } from "../store/messageStore";
+import { MessageContext } from "../context/messageContext";
 
 export default function Message() {
   const [message] = useContext(MessageContext);

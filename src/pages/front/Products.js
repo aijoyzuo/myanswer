@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
-import { useWishList } from "../../store/wishListContext";
+import { useWishList } from "../../context/wishListContext";
 
 
 

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState, useContext } from "react";
-import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../store/messageStore";
+import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../context/messageContext";
 
 
 export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }) {
