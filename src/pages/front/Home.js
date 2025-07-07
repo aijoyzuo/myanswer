@@ -6,32 +6,30 @@ import CarouselPart from "../../components/CarouselPart";
 import { Carousel } from 'bootstrap';
 import { motion } from "framer-motion";
 
+const authorItem = [//authorItem 是一個 不會變動的靜態資料（常數）。每次 Home 元件重新 render，它就會重新建立一次 authorItem 陣列，這是 沒必要的浪費資源。所以可以移到元件外面。
+  {
+    img: 'https://images.plurk.com/1shnZ9bIDDdZRmX9NF7FlC.png ',
+    text: '我們專注於皮膚健康醫美、品牌管理工具、心靈成長冥想與閱讀寫作樂活，打造身心靈整合的美好生活提案。',
+    author: '林玲安 皮膚專科醫師',
+    alt: '林玲安肖像',
+  },
+  {
+    img: 'https://images.plurk.com/27uRo9dvtz1eeept5BKDco.png',
+    text: '我們結合臨床醫美技術、心智覺察訓練與敘事書寫，陪伴顧客共同探索外在美感與內在自信的整合式生活提案。',
+    author: '黃憲傑 整形外科醫師',
+    alt: '黃憲傑肖像',
+  },
+  {
+    img: 'https://images.plurk.com/1IomxDHPrNnKBhljgLwOiP.png',
+    text: '我們融合女性健康教育、品牌定位思維、身心平衡冥想以及療癒性書寫，打造支持女性全生命週期的整體性健康管理與生活美學系統。',
+    author: '蔡芸薇 婦產科醫師',
+    alt: '蔡芸薇肖像',
+  }
+]
+
 export default function Home() {
   const [products, setProducts] = useState([]);
-  const [pagination, setPagination] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
-
-  const authorItem = [
-    {
-      img: 'https://images.plurk.com/1shnZ9bIDDdZRmX9NF7FlC.png ',
-      text: '我們專注於皮膚健康醫美、品牌管理工具、心靈成長冥想與閱讀寫作樂活，打造身心靈整合的美好生活提案。',
-      author: '林玲安 皮膚專科醫師',
-      alt: '林玲安肖像',
-    },
-    {
-      img: 'https://images.plurk.com/27uRo9dvtz1eeept5BKDco.png',
-      text: '我們結合臨床醫美技術、心智覺察訓練與敘事書寫，陪伴顧客共同探索外在美感與內在自信的整合式生活提案。',
-      author: '黃憲傑 整形外科醫師',
-      alt: '黃憲傑肖像',
-    },
-    {
-      img: 'https://images.plurk.com/1IomxDHPrNnKBhljgLwOiP.png',
-      text: '我們融合女性健康教育、品牌定位思維、身心平衡冥想以及療癒性書寫，打造支持女性全生命週期的整體性健康管理與生活美學系統。',
-      author: '蔡芸薇 婦產科醫師',
-      alt: '蔡芸薇肖像',
-    }
-  ]
 
   useEffect(() => {
     const carouselEl = document.querySelector('#carouselExampleControls');
@@ -48,7 +46,6 @@ export default function Home() {
     setIsLoading(true);
     const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/products?page=${page}`);//問號用來查詢參數        
     setProducts(productRes.data.products);
-    setPagination(productRes.data.pagination);
     setIsLoading(false);
   }
 

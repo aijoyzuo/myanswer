@@ -32,7 +32,7 @@ export const messageReducer = (state, action) => { //兩個參數：state（當�
   }
 }
 
-export function handleSuccessMessage(dispatch, res) { //這個函式本來在ProductModal寫好，因為太長所以封裝(右鍵重構)，封裝好後剪下貼上到Store中，再export出去使用
+export function handleSuccessMessage(dispatch, res) { //這個函式本來在ProductModal寫好，因為太長所以封裝(右鍵重構)，封裝好後剪下貼上到context中，再export出去使用
   dispatch({
     type: 'POST_MESSAGE', //顯示成功訊息
     payload: {
