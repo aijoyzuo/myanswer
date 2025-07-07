@@ -7,7 +7,7 @@ import axios from "axios";
 
 export default function Checkout() {
   const { cartData } = useOutletContext(); //取得購物車資料
-  const [payment, setPayment] = useState(defaultPayment);//付款方式額外設定
+
   const navigate = useNavigate();//submit到下一頁
   const SHIPPING_FEE = 160;
 
@@ -19,7 +19,8 @@ export default function Checkout() {
   ];
 
   const defaultPayment = paymentOptions[0].id; // 抓第一個 key 當預設
-
+  const [payment, setPayment] = useState(defaultPayment);//付款方式額外設定
+  
   const {  //react-hook-form的啟用
     register,
     handleSubmit,

@@ -1,8 +1,8 @@
 // WishListContext.js
 //這個檔案是「全域資料管理工具」，它負責：儲存收藏清單（wishList 狀態）；提供 toggleWish 函式；將資料透過 Context 供其他元件使用
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 
-const WishListContext = createContext();
+export const WishListContext = createContext();
 
 export const WishListProvider = ({ children }) => {
   const [wishList, setWishList] = useState(() => {
@@ -28,5 +28,3 @@ export const WishListProvider = ({ children }) => {
     </WishListContext.Provider>
   );
 };
-
-export const useWishList = () => useContext(WishListContext);

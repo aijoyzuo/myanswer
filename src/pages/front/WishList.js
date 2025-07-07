@@ -1,5 +1,5 @@
 // WishList.jsx
-import { useWishList } from '../../context/wishListContext';
+import useWishList from '../../hook/useWishList';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
@@ -7,10 +7,10 @@ import { Link } from 'react-router-dom';
 import Loading from '../../components/Loading';
 
 
+
 export default function WishList() {
     const { wishList, toggleWish } = useWishList();
     const [products, setProducts] = useState([]);
-    const [product, setProduct] = useState({});//加入購物車
     const [isLoading, setIsLoading] = useState(false);//加入購物車
     const { getCart } = useOutletContext();//外層傳進來的功能//加入購物車
 
