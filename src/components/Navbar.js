@@ -1,13 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { useWishList } from "../context/wishListContext";
+import useWishList from "../hook/useWishList";
 import { useRef } from "react";
 import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
 
 
 
 
+
 export default function Navbar({ cartData }) {
-    const { wishList } = useWishList();
+    const { wishList } = useWishList;
     const collapseRef = useRef(null);
 
     const handleNavClick = () => {
