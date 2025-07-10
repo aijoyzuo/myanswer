@@ -2,6 +2,12 @@ import axios from "axios";
 import { useEffect, useState, useContext } from "react";
 import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../context/messageContext";
 
+const formatDateForInput = (date) => {
+  const yyyy = date.getFullYear();
+  const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+  const dd = date.getDate().toString().padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }) {
   const [tempData, setTempData] = useState({
@@ -130,12 +136,7 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
                     name='due_date'
                     placeholder='請輸入到期日'
                     className='form-control mt-1'
-                    value={`${date.getFullYear().toString()}-${(date.getMonth() + 1) //getMonth需加1才會是正確月份
-                      .toString()
-                      .padStart(2, 0)}-${date //第一個參數是目標字串長度(targetLength)，第二個參數是在前面用字串0補上(padString)
-                        .getDate()
-                        .toString()
-                        .padStart(2, 0)}`}
+                    value={formatDateForInput(date)}
                     onChange={(e) => {
                       setDate(new Date(e.target.value));//先把時間存在new Date
                     }}

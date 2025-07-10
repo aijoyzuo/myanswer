@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { WishListProvider } from "../../context/wishListContext";
+import { WishListProvider } from "../../context/WishListContext";
 
 
 export default function FrontLayout() {
