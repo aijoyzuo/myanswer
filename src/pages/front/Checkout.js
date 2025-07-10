@@ -1,7 +1,7 @@
 
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useForm } from 'react-hook-form'; //先執行npm install react-hook-form
-import { Input } from "../../components/FormElements"; //將事先做好的FormElements存成元件再引入需要的部分
+import { Input } from "../../components/form/Input"; //將事先做好的表格元件存成元件再引入需要的部分
 import { useState } from "react";
 import axios from "axios";
 
