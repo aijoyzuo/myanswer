@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-export default function ServicePart({ img, alt, name, description, suitableFor }) {
+export default function ServicePart({ img, alt, name, description, suitableFor,onReserveClick }) {
   return (
     <div className="col-md-3 mb-4 py-1">
       <motion.div
@@ -19,7 +19,7 @@ export default function ServicePart({ img, alt, name, description, suitableFor }
             <h5 className="card-title text-center mb-3 py-2 fw-bold">{name}</h5>
             <p className="card-text"> {description}</p>
             <p className="card-text"> 適用對象：{suitableFor}</p>
-            <button className="btn btn-primary rounded-0 fw-bold text-white">瞭解更多</button>
+            <button className="btn btn-primary rounded-0 fw-bold text-white" onClick={onReserveClick}>LINE 預約諮詢</button>
           </div>
         </div>
       </motion.div>
