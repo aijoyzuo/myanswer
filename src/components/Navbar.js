@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom";
-import useWishList from "../hook/useWishList";
 import { useRef } from "react";
 import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
 
@@ -8,7 +7,6 @@ import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
 
 
 export default function Navbar({ cartData }) {
-    const { wishList } = useWishList();
     const collapseRef = useRef(null);
 
     const handleNavClick = () => {
@@ -63,9 +61,6 @@ export default function Navbar({ cartData }) {
                             <div className="d-flex align-items-center justify-content-end w-50">
                                 <NavLink to="/wishlist" className="nav-link position-relative d-none d-md-block">
                                     <i className="bi bi-heart-fill"></i>
-                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        {wishList.length}
-                                    </span>
                                 </NavLink>
                                 <NavLink to="/cart" className="nav-link position-relative ms-4">
                                     <i className="bi bi-bag-fill"></i>

@@ -71,7 +71,7 @@ export default function WishList() {
                                         <p className="text-muted">{product.category}</p>
                                         <p>NT${product.price}</p>
                                         <button className="btn btn-outline-primary mt-auto rounded-0" onClick={() => toggleWish(product.id)}>取消收藏</button>
-                                        <button className="btn btn-dark mt-2 rounded-0"
+                                        <button className="btn btn-primary mt-2 rounded-0"
                                             onClick={() => addToCart(product)}
                                             disabled={isLoading}>加入購物車</button>
                                     </div>
