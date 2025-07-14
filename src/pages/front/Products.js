@@ -36,21 +36,21 @@ export default function Products() {
     let filtered = allProducts;
 
     if (keyword) {
-      filtered = filterProducts(allProducts, keyword);  
+      filtered = filterProducts(allProducts, keyword);
 
       if (filtered.length === 0) {
         setTimeout(() => {
-          setSearchKeyword('');       
+          setSearchKeyword('');
           setProducts(allProducts);
         }, 2000);
       }
     }
-    
+
 
     setProducts(filtered);
     setPagination(res.data.pagination || {});
     setIsLoading(false);
-  },[]);
+  }, []);
 
   useEffect(() => {
     getProducts({ page: 1 });
@@ -82,15 +82,7 @@ export default function Products() {
           >
             搜尋
           </button>
-          <button
-            className="btn btn-outline-primary rounded-0"
-            onClick={() => {
-              setSearchKeyword('');
-              getProducts({ page: 1 }); // 重新取得商品
-            }}
-          >
-            查看全部商品
-          </button>
+
 
 
 
