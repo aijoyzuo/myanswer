@@ -98,38 +98,38 @@ export default function Products() {
         {products.map((product) => {
           //console.log(product);
           return (
-            <div className="col-md-3" key={product.id}>
-              <div className="card border-0 mb-4 position-relative position-relative d-flex flex-column h-100">
-                <Link to={`/product/${product.id}`} >
+
+            <div className="col-md-4 col-lg-3 mb-3" key={product.id}>
+              <Link to={`/product/${product.id}`} className="nodecoration">
+                <div className="card border-0 position-relative position-relative d-flex flex-column h-100 mb-1 hover-shadow">
                   <img
                     src={product.imageUrl}
-                    className="card-img-top rounded-0 object-cover" //object-cover是我在utilities自己設定的
-                    height={300}
-                    alt="..." />
-                </Link>
-                <div className="text-dark">
-                  <i className={`bi ${wishList.includes(product.id) ? 'bi-heart-fill' : 'bi-heart'} text-primary`}
-                    onClick={() => toggleWish(product.id)}
-                    style={{ right: '16px', top: '16px', position: "absolute", cursor: "pointer" }}></i>
+                    className="card-img-top rounded-0 object-cover responsive-img" //object-cover是我在utilities自己設定的
+                    alt={product.title} />
+                  <div className="text-dark">
+                    <i className={`bi ${wishList.includes(product.id) ? 'bi-heart-fill' : 'bi-heart'} text-primary`}
+                      onClick={() => toggleWish(product.id)}
+                      style={{ right: '16px', top: '16px', position: "absolute", cursor: "pointer" }}></i>
+                  </div>
+
+                  <div className="card-body d-flex flex-column">
+                    <h4 className="mb-1 mt-3 h5 text-center text-primary" style={{ letterSpacing: '0.05em', fontWeight: 500 }}>
+                      {product.title}
+                    </h4>
+                    <div className="text-center">
+                      <span className="h6 text-white badge bg-primary d-inline-block mt-1">{product.category}</span>
+                    </div>
+                    <p className="card-text text-muted mb-0 flex-grow-1 mt-2">{product.description}</p>
+                  </div>
                 </div>
-
-                <div className="card-body p-0  d-flex flex-column">
-
-                  <h4 className="mb-1 mt-3 h5 text-center"><Link to={`/product/${product.id}`} >{product.title}</Link></h4>
-                  <p className="text-muted mt-1 h6 text-center">{product.category}</p>
-                  <p className="card-text text-muted mb-0 flex-grow-1">{product.description}</p>
-                  <Link to={`/product/${product.id}`} className="text-decoration-none">
-                    <p className="text-white mt-3 text-center bg-primary p-2 ">NT$ {product.price}</p>
-                  </Link>
-
-                </div>
-              </div>
+              </Link>
             </div>
+
           )
         })}
 
       </div>
-      <nav className="d-flex justify-content-center">
+      <nav className="d-flex justify-content-center mt-3">
         <Pagination pagination={pagination} changePage={getProducts} />
       </nav>
     </div>

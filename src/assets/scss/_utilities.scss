@@ -1,12 +1,16 @@
-.object-cover{
-    object-fit:cover;
+.object-cover {
+  object-fit: cover;
 }
+
 .wishlist-img {
-  height: 300px;             /* 預設手機尺寸（小於 md）時為 300px */
-  object-fit: contain;       /* 保持圖片完整呈現 */
+  height: 300px;
+  /* 預設手機尺寸（小於 md）時為 300px */
+  object-fit: contain;
+  /* 保持圖片完整呈現 */
 
   @media (min-width: 768px) {
-    height: 200px;           /* md 以上，變為 200px */
+    height: 200px;
+    /* md 以上，變為 200px */
   }
 }
 
@@ -33,9 +37,29 @@
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-100%);
   }
 }
 
+//products
+.nodecoration {
+  text-decoration: none;
+}
 
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 0.9rem rgba(0, 0, 0, 0.15);
+  /* 和 Bootstrap 的 shadow-lg 類似 */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.responsive-img {
+  height: 300px;
+}
+
+@media (min-width: 768px) {
+  .responsive-img {
+    height: 270px;
+  }
+}
