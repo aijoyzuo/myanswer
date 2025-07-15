@@ -9,6 +9,13 @@ import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
 export default function Navbar({ cartData }) {
     const collapseRef = useRef(null);
 
+    const toggleNavbar = () => {
+        if (collapseRef.current) {
+            const bsCollapse = Collapse.getOrCreateInstance(collapseRef.current);
+            bsCollapse.toggle(); // 這行會「自動判斷是開還是關」
+        }
+    };
+
     const handleNavClick = () => {
         if (window.innerWidth < 768 && collapseRef.current) { //collapseRef.current：確保 ref 真的有抓到 <div className="collapse navbar-collapse" id="navbarNav"> 這個 DOM 元素。
             // useRef(null) 創建一個物件，裡面有一個 .current 屬性，初始值是 null。
@@ -37,10 +44,11 @@ export default function Navbar({ cartData }) {
                         <div className="container-fluid position-relative d-flex align-items-center justify-content-between">
                             <button className="navbar-toggler d-md-none"
                                 type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#navbarNav"
+                                //data-bs-toggle="collapse"
+                                //data-bs-target="#navbarNav"
                                 aria-controls="navbarNav"
                                 aria-expanded="false"
+                                onClick={toggleNavbar}
                                 aria-label="Toggle navigation">
                                 <span className="navbar-toggler-icon" style={{ width: "18px", height: "18px" }}></span>
                             </button>
