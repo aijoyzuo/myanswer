@@ -179,8 +179,8 @@ export default function Checkout() {
                         <p className="mb-0">x{item.qty}</p>
                       </div>
                       <div className="d-flex justify-content-between">
-                        <p className="text-muted mb-0"><small>NT${item.product.price}</small></p>
-                        <p className="mb-0">NT${item.total}</p>
+                        <p className="text-muted mb-0"><small>NT${item.product.price?.toLocaleString()}</small></p>
+                        <p className="mb-0">NT${item.total?.toLocaleString()}</p>
                       </div>
                     </div>
                   </div>
@@ -192,15 +192,15 @@ export default function Checkout() {
                 <tbody>
                   <tr>
                     <th scope="row" className="border-0 px-0 font-weight-normal">小計</th>
-                    <td className="text-end border-0 px-0">NT$ {cartData.total}</td>
+                    <td className="text-end border-0 px-0">NT$ {cartData.total?.toLocaleString()}</td>
                   </tr>
                   <tr>
                     <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">套用優惠券</th>
-                    <td className="text-end border-0 px-0 pt-0">-NT${cartData.total - cartData.final_total}</td>
+                    <td className="text-end border-0 px-0 pt-0">-NT${(cartData.total - cartData.final_total)?.toLocaleString()}</td>
                   </tr>
                   <tr>
                     <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">運費</th>
-                    <td className="text-end border-0 px-0 pt-0">+NT$160</td>
+                    <td className="text-end border-0 px-0 pt-0">+NT${SHIPPING_FEE.toLocaleString()}</td>
                   </tr>
                   <tr>
                     <th scope="row" className="border-0 px-0 pt-0 pb-4 font-weight-normal">付款方式</th>
@@ -213,7 +213,7 @@ export default function Checkout() {
               </table>
               <div className="d-flex justify-content-between mt-4">
                 <p className="mb-0 h4 fw-bold">結帳總金額</p>
-                <p className="mb-0 h4 fw-bold">NT${cartData.final_total + 160}</p>
+                <p className="mb-0 h4 fw-bold">NT${(cartData.final_total + SHIPPING_FEE)?.toLocaleString()}</p>
               </div>
             </div>
           </div>

@@ -95,7 +95,7 @@ export default function Cart() {
                           }
                         </select>
                       </div>
-                      <p className="mb-0 ms-auto">NT${item.total}</p>
+                      <p className="mb-0 ms-auto">NT${item.total?.toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
@@ -106,21 +106,21 @@ export default function Cart() {
               <tbody>
                 <tr>
                   <th scope="row" className="border-0 px-0 font-weight-normal">小計</th>
-                  <td className="text-end border-0 px-0">NT$ {cartData.total}</td>
+                  <td className="text-end border-0 px-0">NT$ {cartData.total?.toLocaleString()}</td>
                 </tr>
                 <tr>
                   <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">套用優惠券</th>
-                  <td className="text-end border-0 px-0 pt-0">-NT${cartData.total - cartData.final_total}</td>
+                  <td className="text-end border-0 px-0 pt-0">-NT${(cartData.total - cartData.final_total)?.toLocaleString()}</td>
                 </tr>
                 <tr>
                   <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">運費</th>
-                  <td className="text-end border-0 px-0 pt-0">+NT${SHIPPING_FEE}</td>
+                  <td className="text-end border-0 px-0 pt-0">+NT${SHIPPING_FEE.toLocaleString()}</td>
                 </tr>
               </tbody>
             </table>
             <div className="d-flex justify-content-between mt-4">
               <p className="mb-0 h4 fw-bold">結帳總金額</p>
-              <p className="mb-0 h4 fw-bold">NT${Math.ceil(cartData.final_total + 160)}</p>
+              <p className="mb-0 h4 fw-bold">NT${Math.ceil(cartData.final_total + SHIPPING_FEE).toLocaleString()}</p>
             </div>
             <Link to="../checkout" className="btn btn-dark btn-block mt-4 rounded-0 py-3 w-100">確認明細</Link></>)
             : (<div className="text-center mt-5">

@@ -128,7 +128,7 @@ export default function ProductDetail() {
         <div className="col-md-7">
 
           <h2 className="mb-0">{product.title}</h2>
-          <p className="fw-bold">NT${product.price}</p>
+          <p className="fw-bold">NT${(product.price ?? 0).toLocaleString()}</p>
           <p className="text-muted mb-0">品牌： {product.category}</p>
           <p>{product.description}</p>
           <div className="accordion border border-bottom border-top-0 border-start-0 border-end-0 mb-3" id="accordionExample">
@@ -161,7 +161,7 @@ export default function ProductDetail() {
                           <div className="card-body p-2">
                             <h6 className="card-title text-truncate mb-0">{item.title}</h6>
                             <p className="card-text mb-1 text-muted">{item.category}</p>
-                            <p className="card-text text-muted">NT${item.price}</p>
+                            <p className="card-text text-muted">NT${(item.price ?? 0).toLocaleString()}</p>
                             <span className="stretched-link"></span> {/*父層position-relative+這行，讓整張卡片都可以點擊*/}
                           </div>
                         </div>

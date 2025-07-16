@@ -6,7 +6,7 @@ import { useLocation } from "react-router-dom"; //運費
 export default function Success() {
   const { orderId } = useParams();//從網址的路由參數中，取得 orderId 的值，並存到變數 orderId。(它會回傳一個物件{orderId: (路由上的值)}
   const location = useLocation(); //接收運費
-  const shippingFee = location.state?.shipping || 160; // fallback 預設 160（保險）
+  const SHIPPING_FEE = location.state?.shipping || 160; // fallback 預設 160（保險）
 
 
   const [orderData, setOrderData] = useState({});
@@ -58,8 +58,8 @@ export default function Success() {
                               <p className="mb-0">x{item.qty}</p>
                             </div>
                             <div className="d-flex justify-content-between mt-auto">
-                              <p className="text-muted mb-0"><small>NT${item.product.price}</small></p>
-                              <p className="mb-0">NT${Math.ceil(item.final_total)}</p>
+                              <p className="text-muted mb-0"><small>NT${item.product.price?.toLocaleString()}</small></p>
+                              <p className="mb-0">NT${Math.ceil(item.final_total)?.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
@@ -72,14 +72,14 @@ export default function Success() {
                       <tbody>
                         <tr>
                           <th scope="row" className="border-0 px-0 font-weight-normal">運費</th>
-                          <td className="text-end border-0 px-0">NT${shippingFee}</td>
+                          <td className="text-end border-0 px-0">NT${SHIPPING_FEE.toLocaleString()}</td>
                         </tr>
                       </tbody>
                     </table>
                     <div className="d-flex justify-content-between mt-2">
                       <p className="mb-0 h4 fw-bold">結帳總金額</p>
                       <p className="mb-0 h4 fw-bold">
-                        NT${Math.ceil(orderData.total + shippingFee)} </p>
+                        NT${Math.ceil(orderData.total + SHIPPING_FEE)?.toLocaleString()} </p>
                     </div>
                   </li>
                 </ul>
