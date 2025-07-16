@@ -80,7 +80,7 @@ export default function Services() {
       <h2 className="mb-5 fw-bold">服務項目</h2>
       <div className="row">
         {serviceItem.map((item, index) => (
-          <ServicePart
+          <ServicePart            
             key={index}
             img={item.img}
             alt={item.alt}
