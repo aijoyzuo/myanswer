@@ -1,4 +1,4 @@
-export const Input = ({ id, labelText, register, type, errors, rules }) => {
+export const Input = ({ id, labelText, register, type, errors, rules, placeholder }) => {
   return (
     <>
       <label htmlFor={id} className='form-label'>
@@ -7,6 +7,7 @@ export const Input = ({ id, labelText, register, type, errors, rules }) => {
       <input
         id={id}
         type={type}
+        placeholder={placeholder}
         className={`form-control ${errors[id] && 'is-invalid'}`}
         {...register(id, rules)}
       />

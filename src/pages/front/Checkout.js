@@ -75,6 +75,7 @@ export default function Checkout() {
                   <Input
                     id='email'
                     labelText='Email'
+                    placeholder='answer@gmail.com'
                     type='email'
                     errors={errors}
                     register={register}
@@ -93,6 +94,7 @@ export default function Checkout() {
                     type='text'
                     errors={errors}
                     labelText='姓名'
+                    placeholder='○○○'
                     register={register}
                     rules={{
                       required: '使用者名稱為必填',
@@ -108,6 +110,7 @@ export default function Checkout() {
                     id='tel'
                     labelText='電話'
                     type='tel'
+                    placeholder='09xx-xxx-xxx'
                     errors={errors}
                     register={register}
                     rules={{
@@ -127,6 +130,7 @@ export default function Checkout() {
                   <Input
                     id='address'
                     labelText='地址'
+                    placeholder='台北市小安區民和路一段113號2樓之一'
                     type='address'
                     errors={errors}
                     register={register}
