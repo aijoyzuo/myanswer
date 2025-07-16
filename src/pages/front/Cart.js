@@ -54,16 +54,6 @@ export default function Cart() {
           <div className="d-flex justify-content-between">
             <h2 className="mt-2">購物車明細</h2>
           </div>
-          <div className="row">
-            <div className="col-md-7">
-              <input type="text" className="form-control rounded-0 py-3 w-100" placeholder="輸入優惠碼"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)} />
-            </div>
-            <div className="col-md-5">
-              <button className="btn btn-dark btn-block rounded-0 py-3 w-100" type="button" onClick={applyCoupon} disabled={!couponCode}>輸入優惠碼</button>
-            </div>
-          </div>
           {cartData?.carts?.length > 0 ? (<>
             {cartData?.carts?.map((item) => {
               return (
@@ -101,8 +91,17 @@ export default function Cart() {
                 </div>
               )
             })}
-
-            <table className="table mt-4 text-muted">
+            <div className="row mt-4">
+              <div className="col-md-7">
+                <input type="text" className="form-control rounded-0 py-1 w-100" placeholder="輸入優惠碼享折扣"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)} />
+              </div>
+              <div className="col-md-5">
+                <button className="btn btn-dark btn-block rounded-0 py-1 w-100" type="button" onClick={applyCoupon} disabled={!couponCode}>套用優惠券</button>
+              </div>
+            </div>
+            <table className="table mt-1 text-muted">
               <tbody>
                 <tr>
                   <th scope="row" className="border-0 px-0 font-weight-normal">小計</th>
