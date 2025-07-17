@@ -20,7 +20,7 @@ export default function Checkout() {
 
   const defaultPayment = paymentOptions[0].id; // 抓第一個 key 當預設
   const [payment, setPayment] = useState(defaultPayment);//付款方式額外設定
-  
+
   const {  //react-hook-form的啟用
     register,
     handleSubmit,
@@ -164,7 +164,7 @@ export default function Checkout() {
               <input type="text" className="form-control rounded-0 mt-1" id="message" placeholder="" {...register('message')} />
             </div>
 
-            <div className="d-flex flex-column-reverse flex-md-row mt-4 justify-content-between align-items-md-center align-items-end w-100">
+            <div className="d-flex mt-4 justify-content-between align-items-md-center align-items-end w-100">
               <Link to="../products" className="text-dark mt-md-0 mt-3"><i className="bi bi-arrow-left-short me-1"></i> 繼續選購</Link>
               <button type="submit" className="btn btn-dark py-3 px-7 rounded-0">送出結帳</button>
             </div>
@@ -195,21 +195,21 @@ export default function Checkout() {
               <table className="table mt-4 border-top border-bottom text-muted">
                 <tbody>
                   <tr>
-                    <th scope="row" className="border-0 px-0 font-weight-normal">小計</th>
-                    <td className="text-end border-0 px-0">NT$ {cartData.total?.toLocaleString()}</td>
+                    <th scope="row" className="border-0 px-0 pb-3 font-weight-normal bg-transparent">小計</th>
+                    <td className="text-end border-0 px-0 pb-3 bg-transparent">NT$ {cartData.total?.toLocaleString()}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">套用優惠券</th>
-                    <td className="text-end border-0 px-0 pt-0">-NT${(cartData.total - cartData.final_total)?.toLocaleString()}</td>
+                    <th scope="row" className="border-0 px-0 pb-3 pt-0 font-weight-normal bg-transparent">套用優惠券</th>
+                    <td className="text-end border-0 px-0 pb-3 pt-0 bg-transparent">-NT${(cartData.total - cartData.final_total)?.toLocaleString()}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">運費</th>
-                    <td className="text-end border-0 px-0 pt-0">+NT${SHIPPING_FEE.toLocaleString()}</td>
+                    <th scope="row" className="border-0 px-0 pb-3 pt-0 font-weight-normal bg-transparent">運費</th>
+                    <td className="text-end border-0 px-0 pb-3 pt-0 bg-transparent">+NT${SHIPPING_FEE.toLocaleString()}</td>
                   </tr>
                   <tr>
-                    <th scope="row" className="border-0 px-0 pt-0 pb-4 font-weight-normal">付款方式</th>
-                    <td className="text-end border-0 px-0 pt-0 pb-4">
-                      {paymentOptions[payment]}
+                    <th scope="row" className="border-0 px-0 pt-0 pb-4 font-weight-normal bg-transparent">付款方式</th>
+                    <td className="text-end border-0 px-0 pt-0 pb-4 bg-transparent">
+                      {paymentOptions.find(opt => opt.id === payment)?.label}
                       {/*把 payment 這個變數的值（如 'option1'）拿來當作「索引 key」去查 paymentOptions 的值*/}
                     </td>
                   </tr>

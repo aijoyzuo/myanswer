@@ -5,6 +5,7 @@ import axios from "axios";
 import CarouselPart from "../../components/CarouselPart";
 import { Carousel } from 'bootstrap';
 import { motion } from "framer-motion";
+import { Modal, Button } from "react-bootstrap";
 
 const authorItem = [//authorItem 是一個 不會變動的靜態資料（常數）。每次 Home 元件重新 render，它就會重新建立一次 authorItem 陣列，這是 沒必要的浪費資源。所以可以移到元件外面。
   {
@@ -30,6 +31,7 @@ const authorItem = [//authorItem 是一個 不會變動的靜態資料（常數�
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const carouselEl = document.querySelector('#carouselExampleControls');
@@ -76,6 +78,14 @@ export default function Home() {
           <p className="h6 font-weight-normal text-muted mt-2">
             提供安心專業的肌膚管理產品與肌管諮詢，在舒適放鬆的環境，享受最有效率的保養。
           </p>
+          <div className="d-grid d-md-block text-end">
+            <button
+              className="btn btn-outline-primary mt-3"
+              onClick={() => setIsModalOpen(true)}
+            >
+              LINE 預約諮詢
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -108,7 +118,7 @@ export default function Home() {
     </div>
     <div className="bg-light mt-7">
       <div className="container">
-        <h2 className="fw-bold py-3">醫師團隊</h2>
+        <h2 className="fw-bold pt-3 pb-2">醫師團隊</h2>
         <div id="carouselExampleControls" className="carousel slide" data-bs-ride="carousel" data-bs-interval="1500" data-bs-wrap="true">
           <div className="carousel-inner">
             {authorItem.map((item, index) => (
@@ -170,5 +180,21 @@ export default function Home() {
         </div>
       </div>
     </div>
+    <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)} backdrop="static" centered>
+      <Modal.Header closeButton className="bg-primary">
+        <Modal.Title className="text-white">LINE 預約諮詢</Modal.Title>
+      </Modal.Header>
+      <Modal.Body className="text-center">
+        <p>掃描下方 QR Code 加入 LINE 好友，由專人為您服務</p>
+        <img src="https://images.plurk.com/79bOdl5KL7nxzsyrLvan8N.jpg" alt="LINE QR Code" style={{ maxWidth: '100%' }} />
+      </Modal.Body>
+      <Modal.Footer className="d-flex justify-content-center  border-0">
+        <Button variant="primary" className="w-100" onClick={() => setIsModalOpen(false)}>
+          已成為好友
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
+
   </>)
 }

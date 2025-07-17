@@ -6,6 +6,7 @@ export default function Breadcrumbs() {
 
   const routeNameMap = {
     products: "產品列表",
+    product: "產品列表",
     category: "分類",
     cart: "購物車",
     checkout: "結帳",
