@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useOutletContext, useParams, Link } from 'react-router-dom';
 import ImageSwiper from '../../components/ImageSwiper';
+import Loading from "../../components/Loading";
+import Breadcrumbs from '../../components/Breadcrumbs';
 
 export default function ProductDetail() {
   const [product, setProduct] = useState({});
@@ -12,6 +14,7 @@ export default function ProductDetail() {
   const { getCart } = useOutletContext();
 
   const getProduct = async () => {
+    setIsLoading(true);
     try {
       const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/product/${id}`);
       const fetchedProduct = productRes.data.product;
@@ -19,6 +22,8 @@ export default function ProductDetail() {
       getRelatedProducts(fetchedProduct.category, fetchedProduct.id);
     } catch (error) {
       console.error('取得商品失敗', error);
+    } finally {
+      setIsLoading(false); // ✅ 確保不論成功或錯誤都會關閉 loading
     }
   };
 
@@ -62,6 +67,8 @@ export default function ProductDetail() {
   return (
     <>
       <div className="container">
+        <Loading isLoading={isLoading} />
+        <Breadcrumbs />
         <div className="row">
           <div className="col-md-6">
             <div

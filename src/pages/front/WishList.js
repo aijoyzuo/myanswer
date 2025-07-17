@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useOutletContext } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Loading from '../../components/Loading';
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 
 
@@ -52,6 +53,7 @@ export default function WishList() {
     return (
         <div className="container my-5">
             <Loading isLoading={isLoading} />
+            <Breadcrumbs />
             <h2>心動清單</h2>
             <div>
                 {wishList.length === 0 ? (

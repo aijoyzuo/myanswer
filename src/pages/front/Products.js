@@ -4,6 +4,7 @@ import { Link, useOutletContext, } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
 import useWishList from "../../hook/useWishList";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 
 
@@ -61,15 +62,15 @@ export default function Products() {
 
   //品牌按鈕
   const getAllCategories = useCallback(async () => {
-  try {
-    const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/products/all`);
-    const allProducts = Object.values(res.data.products);
-    const allCategories = [...new Set(allProducts.map(p => p.category))];
-    setCategories(allCategories);
-  } catch (error) {
-    console.error("無法取得全部產品分類", error);
-  }
-}, []);
+    try {
+      const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/products/all`);
+      const allProducts = Object.values(res.data.products);
+      const allCategories = [...new Set(allProducts.map(p => p.category))];
+      setCategories(allCategories);
+    } catch (error) {
+      console.error("無法取得全部產品分類", error);
+    }
+  }, []);
 
   useEffect(() => {
     getProducts({ page: 1 });
@@ -99,6 +100,7 @@ export default function Products() {
   return (<>
     <div className="container mt-md-6 mt-3 mb-7">
       <Loading isLoading={isLoading} />
+      <Breadcrumbs />
       <div className="d-flex flex-column justify-content-center mt-md-0 mt-3">
         <h2 className="fw-bold">產品列表</h2>
         <h6 className="font-weight-normal text-muted mt-2">
@@ -154,7 +156,7 @@ export default function Products() {
         {products.map((product) => {
           return (
 
-            <div className="col-md-4 col-lg-3 mb-3 d-flex" key={product.id}>
+            <div className="col-md-4 mb-3 d-flex" key={product.id}>
               <div className="card border-0 position-relative d-flex flex-column h-100 w-100 hover-shadow">
                 <Link to={`/product/${product.id}`} className="nodecoration">
                   <img
@@ -175,7 +177,8 @@ export default function Products() {
                     <div className="text-center">
                       <span className="h6 text-white badge bg-primary d-inline-block mt-1">{product.category}</span>
                     </div>
-                    <p className="card-text text-muted mb-0 flex-grow-1 mt-2 pb-3">{product.description}</p>
+                    <p className="card-text text-muted mb-0 flex-grow-1 mt-2 ">{product.description}</p>
+                    <p className="card-text text-muted mb-0 flex-grow-1 mt-2 pb-3 text-end pe-2">$NT {product.price.toLocaleString()}</p>
                   </Link>
                   <button
                     type="button"

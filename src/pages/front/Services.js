@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import ServicePart from "../../components/ServicePart";
 import { Modal, Button } from "react-bootstrap";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 export default function Services() {
   const [isLoading, setIsLoading] = useState(false);
@@ -77,10 +78,11 @@ export default function Services() {
   return (<>
     <div className="container my-5">
       <Loading isLoading={isLoading} />
+      <Breadcrumbs />
       <h2 className="mb-5 fw-bold">服務項目</h2>
       <div className="row">
         {serviceItem.map((item, index) => (
-          <ServicePart            
+          <ServicePart
             key={index}
             img={item.img}
             alt={item.alt}

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 
 export default function Cart() {
@@ -49,6 +50,7 @@ export default function Cart() {
 
   return (<>
     <div className="container">
+      <Breadcrumbs />
       <div className="row justify-content-center">
         <div className="col-md-6 bg-white py-5" style={{ minHeight: "calc(100vh - 56px - 76px)" }}>
           <div className="d-flex justify-content-between">
