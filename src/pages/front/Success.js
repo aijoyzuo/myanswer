@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import { useLocation } from "react-router-dom"; //運費
+import { Link } from "react-router-dom";
 
 export default function Success() {
   const { orderId } = useParams();//從網址的路由參數中，取得 orderId 的值，並存到變數 orderId。(它會回傳一個物件{orderId: (路由上的值)}
@@ -38,7 +39,9 @@ export default function Success() {
             <h2>結帳成功</h2>
             <p>訂單已交由專人盡速為您處理，<br />
               肌膚煥新，從此刻開始。</p>
-            <a href="./index.html" className="btn btn-dark me-2 rounded-0 mb-4">回到首頁</a>
+            <Link to="/products" className="btn btn-dark me-2 rounded-0 mb-4">
+              繼續逛逛
+            </Link>            
           </div>
           <div className="col-md-6">
             <div className="card rounded-0 py-4">

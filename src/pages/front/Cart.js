@@ -94,12 +94,12 @@ export default function Cart() {
               )
             })}
             <div className="row mt-4">
-              <div className="col-md-7">
+              <div className="col-7">
                 <input type="text" className="form-control rounded-0 py-1 w-100" placeholder="輸入優惠碼享折扣"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)} />
               </div>
-              <div className="col-md-5">
+              <div className="col-5">
                 <button className="btn btn-dark btn-block rounded-0 py-1 w-100" type="button" onClick={applyCoupon} disabled={!couponCode}>套用優惠券</button>
               </div>
             </div>
@@ -123,7 +123,7 @@ export default function Cart() {
               <p className="mb-0 h4 fw-bold">結帳總金額</p>
               <p className="mb-0 h4 fw-bold">NT${Math.ceil(cartData.final_total + SHIPPING_FEE).toLocaleString()}</p>
             </div>
-            <Link to="../checkout" className="btn btn-dark btn-block mt-4 rounded-0 py-3 w-100">確認明細</Link></>)
+            <Link to="../checkout" className="fw-bold btn btn-primary text-white btn-block mt-4 rounded-0 py-3 w-100">確認明細</Link></>)
             : (<div className="text-center mt-5">
               <h4 className="mb-3">目前購物車是空的</h4>
               <Link to="/products" className="btn btn-dark btn-block mt-4 rounded-0 py-3 px-5">
