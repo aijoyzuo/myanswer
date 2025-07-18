@@ -64,94 +64,53 @@ export default function ProductDetail() {
     getProduct(id);
   }, [id]);
 
+
+  const allImages = [
+    ...(product.imageUrl ? [product.imageUrl] : []),
+    ...(Array.isArray(product.imagesUrl) ? product.imagesUrl : [])
+  ];
+
   return (
+
     <>
       <div className="container">
         <Loading isLoading={isLoading} />
         <Breadcrumbs />
-        <div className="row">
-          <div className="col-md-6">
-            <div
-              style={{
-                height: '300px',
-                backgroundImage: `url(${product.imageUrl})`,
-                backgroundPosition: 'center center',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-              }}
-            ></div>
-          </div>
-          <div className="col-md-6">
-            <div className="my-4">
-              {Array.isArray(product.imagesUrl) && product.imagesUrl.length > 0 && (
-                <ImageSwiper images={product.imagesUrl} />
-              )}
-            </div>
-          </div>
-        </div>
 
-        <div className="row justify-content-between mt-4 mb-7">
-          <div className="col-md-7">
-            <h2 className="mb-0">{product.title}</h2>
-            <p className="fw-bold">NT${(product.price ?? 0).toLocaleString()}</p>
-            <p className="text-muted mb-0">品牌：{product.category}</p>
-            <p>{product.description}</p>
+        {/* 商品內容區塊 */}
+        <div className="row mt-4">
+          {/* 左欄：swiper 圖片 */}
+          <div className="col-12 col-md-7">
+            {allImages.length > 0 && <ImageSwiper images={allImages} />}
+          </div>
 
-            <div className="accordion border mb-3" id="accordionExample">
-              <div className="card border-0">
-                <div
-                  className="card-header py-4 bg-white border"
-                  id="headingOne"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#collapseOne"
-                >
-                  <div className="d-flex justify-content-between align-items-center pe-1">
-                    <h4 className="mb-0">成分及使用方法說明</h4>
-                    <i className="fas fa-minus"></i>
-                  </div>
-                </div>
-                <div
-                  id="collapseOne"
-                  className="collapse show"
-                  aria-labelledby="headingOne"
-                  data-bs-parent="#accordionExample"
-                >
-                  <div className="card-body pb-5">{product.content}</div>
-                </div>
-              </div>
+          {/* 右欄：文字說明 + 加入購物車 */}
+          <div className="col-12 col-md-5">
+            <h2 className="mb-2 fw-bold">{product.title}</h2>
+            <div className='d-flex align-items-center mb-3'>
+              <p className="text-muted mb-0">品牌：</p>
+              <p className="h6 text-white badge bg-primary d-inline-block mb-0">{product.category}</p>
             </div>
 
-            {relatedProducts.length > 0 && (
-              <div className="card border-0 mt-1">
-                <h4 className="mb-2">猜你也會喜歡</h4>
-                <div className="row">
-                  {relatedProducts.map((item) => (
-                    <div className="col-4" key={item.id}>
-                      <Link to={`/product/${item.id}`} className="text-decoration-none">
-                        <div
-                          className="card h-100 border-0 text-center position-relative"
-                          style={{ height: '150px', width: '150px' }}
-                        >
-                          <img src={item.imageUrl} className="card-img-top" alt={item.title} />
-                          <div className="card-body p-2">
-                            <h6 className="card-title text-truncate mb-0">{item.title}</h6>
-                            <p className="card-text mb-1 text-muted">{item.category}</p>
-                            <p className="card-text text-muted">
-                              NT${(item.price ?? 0).toLocaleString()}
-                            </p>
-                            <span className="stretched-link"></span>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+            <div className="pb-3 border-bottom">
+              <p className="mb-0">適用：</p>
+              <p className="text-muted">{product.description}</p>
+            </div>
 
-          <div className="col-md-4">
-            <div className="input-group mb-3 border mt-3">
+
+            {/* 成分與使用方法說明 */}
+            <div className="my-3">
+              <div className="">
+                <div className="py-3">
+                  <h6 className="mb-0">成分及使用說明：</h6>
+                </div>
+                <div className="text-muted">{product.content}</div>
+              </div>
+            </div>
+            <p className="fw-bold fs-5 text-end">NT${(product.price ?? 0).toLocaleString()}</p>
+
+            {/* 數量 + 加入購物車按鈕 */}
+            <div className="input-group mb-3 border">
               <button
                 className="btn btn-outline-dark rounded-0 border-0 py-3"
                 type="button"
@@ -161,7 +120,7 @@ export default function ProductDetail() {
               </button>
               <input
                 type="number"
-                className="form-control border-0 text-center my-auto shadow-none"
+                className="form-control border-0 text-center shadow-none"
                 value={cartQuantity}
                 readOnly
               />
@@ -173,9 +132,10 @@ export default function ProductDetail() {
                 <i className="bi bi-plus"></i>
               </button>
             </div>
+
             <button
               type="button"
-              className="btn btn-primary text-white btn-block rounded-0 py-3 w-100"
+              className="btn btn-primary text-white w-100 py-3 rounded-0  d-none d-md-block"
               onClick={addToCart}
               disabled={isLoading}
             >
@@ -183,13 +143,52 @@ export default function ProductDetail() {
             </button>
           </div>
         </div>
+
+        {/* 猜你也會喜歡 */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-5">
+            <h4 className="mb-3 fw-bold">猜你也會喜歡</h4>
+            <hr className="text-secondary"></hr>
+            <div className="row">
+              {relatedProducts.map((item) => (
+                <div className="col-4 mb-4" key={item.id}>
+                  <Link to={`/product/${item.id}`} className="text-decoration-none">
+                    <div className="card h-100 border-0 text-center hover-shadow">
+                      <img
+                        src={item.imageUrl}
+                        className="card-img-top object-fit-contain"
+                        alt={item.title}
+                        style={{ height: "200px", objectFit: "cover" }}
+                      />
+                      <div className="card-body p-2">
+                        <h6 className="card-title text-truncate mb-1">{item.title}</h6>
+                        <p className="card-text text-muted small mb-1">{item.category}</p>
+                        <p className="card-text text-muted mb-0">
+                          NT${(item.price ?? 0).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      {/* 手機版購物車按鈕 */}
+      <div className="d-md-none">
+        <div className="fixed-bottom border-top shadow">
+          <button
+            type="button"
+            className="btn btn-primary w-100 py-4 rounded-0 text-white"
+            onClick={addToCart}
+            disabled={isLoading}
+          >
+            加入購物車
+          </button>
+        </div>
       </div>
 
-      <div className="container">
-        <Link to="/products" className="btn btn-outline-secondary mb-3">
-          <i className="bi bi-arrow-left me-1"></i> 返回產品列表
-        </Link>
-      </div>
     </>
   );
 }

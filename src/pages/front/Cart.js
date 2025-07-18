@@ -65,11 +65,11 @@ export default function Cart() {
                     <button
                       type="button"
                       className="position-absolute btn"
-                      style={{ top: "12px", right: "16px", }}
+                      style={{ top: "8px", right: "16px", }}
                       onClick={() => removeCartItem(item.id)}>
                       <i className="bi bi-x"></i></button>
                     <p className="mb-0 fw-bold">{item.product.title}</p>
-                    <p className="mb-1 text-muted" style={{ fontSize: "14px" }}>{item.product.description}</p>
+                    <p className="mt-1 mb-1 text-muted" style={{ fontSize: "14px" }}>{item.product.description}</p>
                     <div className="d-flex justify-content-between align-items-center w-100">
                       <div className="input-group w-50 align-items-center">
                         <select name="" className="form-select" id=""

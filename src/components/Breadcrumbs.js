@@ -11,7 +11,7 @@ export default function Breadcrumbs() {
     cart: "購物車",
     checkout: "結帳",
     services: "服務項目",
-    wishlist:"心動清單"
+    wishlist: "心動清單"
   };
 
   return (
@@ -21,28 +21,32 @@ export default function Breadcrumbs() {
           <Link to="/">首頁</Link>
         </li>
 
-        {pathnames.map((name, index) => {
-          const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
-          const isLast = index === pathnames.length - 1;
-
-          // 預設顯示名稱
-          let displayName = routeNameMap[name] || decodeURIComponent(name);
-
-          // 處理像 /product/abc123 → "產品詳情"
-          if (index > 0 && pathnames[index - 1] === "product") {
-            displayName = "產品詳情";
-          }
-
-          return isLast ? (
-            <li key={name} className="breadcrumb-item active" aria-current="page">
-              {displayName}
+        {pathnames.length === 2 && pathnames[0] === "product" ? (
+          <>
+            <li className="breadcrumb-item">
+              <Link to="/products">產品列表</Link>
             </li>
-          ) : (
-            <li key={name} className="breadcrumb-item">
-              <Link to={routeTo}>{displayName}</Link>
+            <li className="breadcrumb-item active" aria-current="page">
+              產品詳情
             </li>
-          );
-        })}
+          </>
+        ) : (
+          pathnames.map((name, index) => {
+            const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
+            const isLast = index === pathnames.length - 1;
+            const displayName = routeNameMap[name] || decodeURIComponent(name);
+
+            return isLast ? (
+              <li key={name} className="breadcrumb-item active" aria-current="page">
+                {displayName}
+              </li>
+            ) : (
+              <li key={name} className="breadcrumb-item">
+                <Link to={routeTo}>{displayName}</Link>
+              </li>
+            );
+          })
+        )}
       </ol>
     </nav>
   );
