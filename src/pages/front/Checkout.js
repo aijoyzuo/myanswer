@@ -66,7 +66,7 @@ export default function Checkout() {
   return (<>
     <div className="bg-light pt-5 pb-7">
       <div className="container">
-        <div className="row mt-3 justify-content-center">
+        <div className="row mt-5 justify-content-center">
           <div className="col-md-6">
             <StepIndicator currentStep={2} />
           </div>
