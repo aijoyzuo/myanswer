@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import { useLocation } from "react-router-dom"; //運費
 import { Link } from "react-router-dom";
+import StepIndicator from "../../components/StepIndicator";
 
 export default function Success() {
   const { orderId } = useParams();//從網址的路由參數中，取得 orderId 的值，並存到變數 orderId。(它會回傳一個物件{orderId: (路由上的值)}
@@ -25,15 +26,17 @@ export default function Success() {
 
   return (<>
     <div className="container">
-
-      <div style={{
+      <div className="row mt-5 justify-content-center">
+        <div className="col-md-6">
+          <StepIndicator currentStep={3} />
+        </div>
+      </div>
+      <div className="d-none d-md-block" style={{
         height: "400px", backgroundImage: "url(https://images.plurk.com/52b9CUh5PAv7UT3ScyjoTk.jpg )",
         backgroundPosition: "center center",
       }}>
       </div>
-
-
-      <div className="mt-5 mb-7">
+      <div className="mt-3 mb-7">
         <div className="row">
           <div className="col-md-6">
             <h2>結帳成功</h2>
@@ -41,7 +44,7 @@ export default function Success() {
               肌膚煥新，從此刻開始。</p>
             <Link to="/products" className="btn btn-dark me-2 rounded-0 mb-4">
               繼續逛逛
-            </Link>            
+            </Link>
           </div>
           <div className="col-md-6">
             <div className="card rounded-0 py-4">

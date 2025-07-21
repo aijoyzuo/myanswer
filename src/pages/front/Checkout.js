@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'; //先執行npm install react-hook-for
 import { Input } from "../../components/form/Input"; //將事先做好的表格元件存成元件再引入需要的部分
 import { useState } from "react";
 import axios from "axios";
+import StepIndicator from "../../components/StepIndicator";
 
 export default function Checkout() {
   const { cartData } = useOutletContext(); //取得購物車資料
@@ -65,6 +66,20 @@ export default function Checkout() {
   return (<>
     <div className="bg-light pt-5 pb-7">
       <div className="container">
+        <div className="row mt-3 justify-content-center">
+          <div className="col-md-6">
+            <StepIndicator currentStep={2} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-1"></div>
+          <div className="col-md-6">
+            <div className="d-flex justify-content-start">
+              <h2 className="mt-2">付款資訊</h2>
+            </div>
+          </div>
+          <div className="col-md-4"></div>
+        </div>
         <div className="row justify-content-center flex-md-row flex-column-reverse">
           <form className="col-md-6" onSubmit={handleSubmit(onSubmit)}>
             {/*handleSubmit的功能就是在提交時先驗證表單*/}

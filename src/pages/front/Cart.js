@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import StepIndicator from "../../components/StepIndicator";
 
 
 export default function Cart() {
@@ -51,8 +52,13 @@ export default function Cart() {
   return (<>
     <div className="container">
       <Breadcrumbs />
+      <div className="row mt-3 justify-content-center">
+        <div className="col-md-6">
+          <StepIndicator currentStep={1} />
+        </div>
+      </div>
       <div className="row justify-content-center">
-        <div className="col-md-6 bg-white py-5" style={{ minHeight: "calc(100vh - 56px - 76px)" }}>
+        <div className="col-md-6 bg-white pt-3 pt-md-5 pb-5" style={{ minHeight: "calc(100vh - 56px - 76px)" }}>
           <div className="d-flex justify-content-between">
             <h2 className="mt-2">購物車明細</h2>
           </div>
@@ -123,7 +129,13 @@ export default function Cart() {
               <p className="mb-0 h4 fw-bold">結帳總金額</p>
               <p className="mb-0 h4 fw-bold">NT${Math.ceil(cartData.final_total + SHIPPING_FEE).toLocaleString()}</p>
             </div>
-            <Link to="../checkout" className="fw-bold btn btn-primary text-white btn-block mt-4 rounded-0 py-3 w-100">確認明細</Link></>)
+            <Link to="../checkout" className="fw-bold btn btn-primary text-white btn-block mt-4 rounded-0 py-3 w-100 d-none d-md-block">前往結帳</Link>
+            <Link
+              to="../checkout"
+              className="fw-bold btn btn-primary text-white rounded-0 py-4 w-100 fixed-bottom d-block d-md-none"
+            >
+              前往結帳
+            </Link></>)
             : (<div className="text-center mt-5">
               <h4 className="mb-3">目前購物車是空的</h4>
               <Link to="/products" className="btn btn-dark btn-block mt-4 rounded-0 py-3 px-5">
