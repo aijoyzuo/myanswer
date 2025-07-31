@@ -11,6 +11,7 @@ import Breadcrumbs from "../../components/Breadcrumbs";
 
 export default function Products() {
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('')
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +50,7 @@ export default function Products() {
       if (filtered.length === 0) {
         setTimeout(() => {
           setSearchKeyword('');
+          setSelectedCategory('');  //沒符合結果時，也把 active 狀態清空
           setProducts(allProducts);
         }, 2000);
       }
@@ -108,16 +110,26 @@ export default function Products() {
         </h6>
         <div className="d-flex flex-wrap gap-2 mt-1">
           <button
-            className="btn btn-primary btn-sm"
-            onClick={() => getProducts({ page: 1 })}
+            className={`btn btn-sm ${selectedCategory === '' ? 'btn-primary' : 'btn-outline-primary'}`}
+            onClick={() => {
+              setSelectedCategory('');            // 🆕 設為未選
+              setSearchKeyword('');               // 可選：清掉關鍵字
+              getProducts({ page: 1 });
+            }}
+            aria-pressed={selectedCategory === ''} // 可選：無障礙
           >
             全部品牌
           </button>
           {categories.map((cat) => (
             <button
               key={cat}
-              className="btn btn-outline-primary btn-sm"
-              onClick={() => getProducts({ page: 1, keyword: cat })}
+              className={`btn btn-sm ${selectedCategory === cat ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => {
+                setSelectedCategory(cat);         // 🆕 設為選中
+                setSearchKeyword('');             // 可選：清掉關鍵字
+                getProducts({ page: 1, keyword: cat });
+              }}
+              aria-pressed={selectedCategory === cat} // 可選：無障礙
             >
               {cat}
             </button>
@@ -133,12 +145,16 @@ export default function Products() {
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
+                    setSelectedCategory('');
                     getProducts({ page: 1, keyword: searchKeyword }); // 強制回第一頁
                   }
                 }} />
               <button className="btn btn-primary rounded-0 text-white"
                 type="button"
-                onClick={() => getProducts({ page: 1, keyword: searchKeyword })} //搜尋時自動 reset 分頁
+                onClick={() => {
+                  setSelectedCategory('');
+                  getProducts({ page: 1, keyword: searchKeyword })
+                }} //搜尋時自動 reset 分頁
               >
                 搜尋
               </button>
@@ -161,12 +177,29 @@ export default function Products() {
                 <Link to={`/product/${product.id}`} className="nodecoration">
                   <img
                     src={product.imageUrl}
-                    className="card-img-top rounded-0 object-cover responsive-img" //object-cover是我在utilities自己設定的
-                    alt={product.title} />
+                    className="card-img-top rounded-0 object-cover responsive-img"
+                    alt={product.title}
+                  />
                   <div className="text-dark">
-                    <i className={`bi ${wishList.includes(product.id) ? 'bi-heart-fill' : 'bi-heart'} text-primary`}
-                      onClick={() => toggleWish(product.id)}
-                      style={{ right: '16px', top: '16px', position: "absolute", cursor: "pointer" }}></i>
+                    <i
+                      className={`bi ${wishList.includes(product.id) ? 'bi-heart-fill' : 'bi-heart'} text-primary`}
+                      onClick={(e) => {
+                        e.preventDefault();     // 不讓 <Link> 觸發預設導頁
+                        e.stopPropagation();    // 阻止事件往上冒泡到 <Link>
+                        toggleWish(product.id);
+                      }}
+                      style={{ right: '16px', top: '16px', position: 'absolute', cursor: 'pointer' }}
+                      aria-label={wishList.includes(product.id) ? '移出收藏' : '加入收藏'}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleWish(product.id);
+                        }
+                      }}
+                    />
                   </div>
                 </Link>
                 <div className="card-body d-flex flex-column">
@@ -178,7 +211,7 @@ export default function Products() {
                       <span className="h6 text-white badge bg-primary d-inline-block mt-1">{product.category}</span>
                     </div>
                     <p className="card-text text-muted mb-0 flex-grow-1 mt-2 ">{product.description}</p>
-                    <p className="card-text text-muted mb-0 flex-grow-1 mt-2 pb-3 text-end pe-2">$NT {product.price.toLocaleString()}</p>
+                    <p className="card-text text-muted mb-0 flex-grow-1 mt-2 pb-3 text-end pe-2">NT$ {product.price.toLocaleString()}</p>
                   </Link>
                   <button
                     type="button"

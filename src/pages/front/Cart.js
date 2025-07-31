@@ -52,13 +52,13 @@ export default function Cart() {
   return (<>
     <div className="container">
       <Breadcrumbs />
-      <div className="row mt-3 justify-content-center">
+      <div className="row mt-5 justify-content-center">
         <div className="col-md-6">
           <StepIndicator currentStep={1} />
         </div>
       </div>
       <div className="row justify-content-center">
-        <div className="col-md-6 bg-white pt-3 pt-md-5 pb-5" style={{ minHeight: "calc(100vh - 56px - 76px)" }}>
+        <div className="col-md-6 bg-white pt-3 pb-5" style={{ minHeight: "calc(100vh - 56px - 76px)" }}>
           <div className="d-flex justify-content-between">
             <h2 className="mt-2">購物車明細</h2>
           </div>

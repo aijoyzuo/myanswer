@@ -40,7 +40,7 @@ export default function AdminProducts() {
         setTempProduct(product);//選擇我原先就寫好的product資料，將當下要編輯的這一筆product，以setTempProduct方式，暫存到tempProduct中。因為當下根本沒有tempProduct，所以不是傳入tempProduct
         productModal.current.show();
     }
-    const closeProducModal = () => {//將boostsrap關閉的方法改成用js關閉
+    const closeProductModal = () => {//將boostsrap關閉的方法改成用js關閉
         productModal.current.hide();
     }
 
@@ -66,7 +66,7 @@ export default function AdminProducts() {
     return (<>
         <div className="p-3">
             <ProductModal
-                closeProducModal={closeProducModal}
+                closeProductModal={closeProductModal}
                 getProducts={getProducts}
                 tempProduct={tempProduct}
                 type={type}
