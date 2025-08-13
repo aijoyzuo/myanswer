@@ -175,12 +175,12 @@ export default function Checkout() {
               ))}
             </div>
             <div className="bg-white px-4 py-3 mt-3">
-              <p className="mt-4 mb-2">備註(非必填)</p>
+              <p className="mb-2">備註(非必填)</p>
               <input type="text" className="form-control rounded-0 mt-1" id="message" placeholder="" {...register('message')} />
             </div>
 
-            <div className="d-flex mt-4 justify-content-between align-items-md-center align-items-end w-100">
-              <Link to="../products" className="text-dark mt-md-0 mt-3"><i className="bi bi-arrow-left-short me-1"></i> 繼續選購</Link>
+            <div className="d-flex mt-4 justify-content-between align-items-center align-items-end w-100">
+              <Link to="../products" className="text-dark"><i className="bi bi-arrow-left-short me-1"></i> 繼續選購</Link>
               <button type="submit" className="btn btn-dark py-3 px-7 rounded-0">送出結帳</button>
             </div>
           </form>

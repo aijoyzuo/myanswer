@@ -188,7 +188,7 @@ export default function Products() {
                         e.stopPropagation();    // 阻止事件往上冒泡到 <Link>
                         toggleWish(product.id);
                       }}
-                      style={{ right: '16px', top: '16px', position: 'absolute', cursor: 'pointer' }}
+                      style={{ right: '16px', top: '16px', position: 'absolute', cursor: 'pointer',width: '48px',display: 'flex', height: '48px',alignItems: 'flex-start',   justifyContent: 'flex-end'}}
                       aria-label={wishList.includes(product.id) ? '移出收藏' : '加入收藏'}
                       role="button"
                       tabIndex={0}

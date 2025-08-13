@@ -180,9 +180,10 @@ export default function ProductDetail() {
         <div className="fixed-bottom border-top shadow">
           <button
             type="button"
-            className="btn btn-primary w-100 py-4 rounded-0 text-white"
+            className="btn btn-primary w-100 rounded-0 text-white"
             onClick={addToCart}
             disabled={isLoading}
+            style={{ height: "48px" }}
           >
             加入購物車
           </button>

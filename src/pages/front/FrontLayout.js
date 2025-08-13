@@ -40,8 +40,9 @@ export default function FrontLayout() {
 
         <footer className="bg-dark">
           <div className="container">
-            <div className="d-flex align-items-center justify-content-between text-white py-4">
-              <p className="mb-0">© 2025 ANSWER All Rights Reserved.</p>
+            <div className="d-flex align-items-center justify-content-center text-white"
+            style={{ height: "48px" }}>
+              <p className="mb-0 ">© 2025 ANSWER All Rights Reserved.</p>
             {/*  <ul className="d-flex list-unstyled mb-0 h4">
                 <li><a href="#" className="text-white mx-3"><i className="fab fa-facebook"></i></a></li>
                 <li><a href="#" className="text-white mx-3"><i className="fab fa-instagram"></i></a></li>
