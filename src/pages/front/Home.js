@@ -6,6 +6,7 @@ import CarouselPart from "../../components/CarouselPart";
 import { Carousel } from 'bootstrap';
 import { motion } from "framer-motion";
 import { Modal, Button } from "react-bootstrap";
+import { useForm } from "react-hook-form"; // ⬅️ 訂閱區塊用
 
 const authorItem = [//authorItem 是一個 不會變動的靜態資料（常數）。每次 Home 元件重新 render，它就會重新建立一次 authorItem 陣列，這是 沒必要的浪費資源。所以可以移到元件外面。
   {
@@ -27,6 +28,122 @@ const authorItem = [//authorItem 是一個 不會變動的靜態資料（常數�
     alt: '蔡芸薇肖像',
   }
 ]
+
+// 產品分類 Grid（從 products 自動彙總 category）
+function CategoryGrid({ categories }) {
+  return (
+    <section className="container my-7">
+      <h2 className="fw-bold mb-3">探索分類</h2>
+      <div className="row g-3">
+        {categories.map((c) => (
+          <div key={c.name} className="col-6 col-md-3">
+            <Link to={`/products?category=${encodeURIComponent(c.name)}`} className="text-decoration-none d-block">
+              <div className="ratio ratio-1x1 rounded overflow-hidden mb-2 bg-light">
+                <img
+                  src={c.imageUrl}
+                  alt={c.name}
+                  className="w-100 h-100 object-fit-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="d-flex align-items-center justify-content-between">
+                <span className="fw-semibold text-dark">{c.name}</span>
+                {c.count != null && <small className="text-muted">{c.count} 件</small>}
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+// 熱門商品（目前先取前 6 件；未來可改用 isFeatured/hot 等旗標）
+function HotProducts({ items }) {
+  return (
+    <section className="container my-7">
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <h2 className="fw-bold mb-0">熱門商品</h2>
+        <Link to="/products" className="text-decoration-none">看全部</Link>
+      </div>
+      <div className="row g-4">
+        {items.slice(0, 6).map(product => (
+          <div key={product.id} className="col-6 col-md-4 col-lg-2">
+            <Link to={`/product/${product.id}`} className="text-decoration-none">
+              <div className="ratio ratio-1x1 rounded overflow-hidden bg-light">
+                <img
+                  src={product.imageUrl}
+                  alt={product.title}
+                  className="w-100 h-100 object-fit-cover"
+                  loading="lazy"
+                />
+              </div>
+              <h5 className="mt-2 text-dark text-truncate">{product.title}</h5>
+              <small className="text-muted">{product.category}</small>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// 訂閱電子報（頁面內 + 簡易驗證 + 蜜罐）
+function NewsletterInline() {
+  const { register, handleSubmit, formState: { errors, isSubmitting, isSubmitSuccessful } } = useForm({ mode: 'onTouched' });
+
+  const onSubmit = async ({ email, hp }) => {
+    if (hp) return; // 蜜罐（機器人常會填）
+    // TODO: 呼叫你的訂閱 API（或表單服務，如 Mailchimp, Brevo, Klaviyo 等）
+    await new Promise(r => setTimeout(r, 400)); // demo：模擬 API 延遲
+  };
+  return (
+    <section className="bg-primary py-3 ">
+      <div className="container">
+        <div className="row">
+          <div className="col-md-6">
+            <h2 className="fw-bold mb-2 text-center text-md-start">訂閱最新消息與專屬優惠</h2>
+            <p className="text-light text-center text-md-start mb-2 mb-md-0">收到ANSWER新品、活動與保養知識</p>
+          </div>
+          <div className="col-md-6">
+            {isSubmitSuccessful ? (
+              <p className="text-center">感謝訂閱！請到信箱點擊確認連結</p>
+            ) : (
+              <form className="row g-2 justify-content-center justify-content-md-start" onSubmit={handleSubmit(onSubmit)} noValidate>
+                <div className="col-9">
+                  <input
+                    type="email"
+                    placeholder="Answer@email.com"
+                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                    aria-invalid={!!errors.email}
+                    {...register('email', {
+                      required: 'Email 為必填',
+                      pattern: { value: /^\S+@\S+$/i, message: 'Email 格式不正確' },
+                    })}
+                  />
+                  <div className="invalid-feedback">{errors.email?.message}</div>
+                </div>
+                {/* 蜜罐（隱藏於視覺） */}
+                <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                  <input tabIndex={-1} autoComplete="off" {...register('hp')} />
+                </div>
+                <div className="col-auto">
+                  <button className="btn btn-dark w-100" disabled={isSubmitting} type="submit">訂閱</button>
+                </div>
+                <div className="col-12 text-center text-md-start">
+                  <small className="text-muted">訂閱即代表同意 <a href="/privacy" className="text-muted">隱私權政策</a>。</small>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+
+
+
+      </div>
+    </section>
+  );
+}
+
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -53,7 +170,18 @@ export default function Home() {
 
   useEffect(() => {
     getProducts(1)
-  }, [])
+  }, []);
+  // 由 products 動態彙總分類
+  const categories = Array.from(
+    products.reduce((map, p) => {
+      const key = p.category || '未分類';
+      if (!map.has(key)) map.set(key, { name: key, count: 0, imageUrl: p.imageUrl });
+      const entry = map.get(key);
+      entry.count += 1;
+      // 代表圖：先用第一個遇到的商品圖
+      return map;
+    }, new Map()).values()
+  );
 
 
 
@@ -136,7 +264,14 @@ export default function Home() {
       </div>
     </div >
     <div className="container my-7">
-      <div className="row">
+
+      {/* 2) 產品分類（新的） */}
+      {categories.length > 0 && <CategoryGrid categories={categories} />}
+
+      {/* 3) 熱門商品（新的） */}
+      {products.length > 0 && <HotProducts items={products} />}
+
+      {/*<div className="row">
         {products.slice(0, 3).map((product) => (
 
           <div className="col-md-4" key={product.id}>
@@ -152,10 +287,10 @@ export default function Home() {
             </Link>
           </div>
         ))}
-      </div>
+      </div>*/}
 
     </div >
-    <div className="bg-light py-7">
+    <div className="bg-light pt-7 pb-5">
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-4 text-center">
@@ -180,6 +315,10 @@ export default function Home() {
         </div>
       </div>
     </div>
+    {/*訂閱電子報*/}
+    <NewsletterInline />
+
+
     <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)} backdrop="static" centered>
       <Modal.Header closeButton className="bg-primary">
         <Modal.Title className="text-white">LINE 預約諮詢</Modal.Title>

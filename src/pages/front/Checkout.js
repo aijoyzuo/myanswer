@@ -123,23 +123,22 @@ export default function Checkout() {
                 <div className="mb-2">
                   <Input
                     id='tel'
-                    labelText='電話'
+                    labelText='聯絡電話'
                     type='tel'
-                    placeholder='09xx-xxx-xxx'
+                    placeholder='手機 09xx-xxx-xxx 或 市話 0x-xxxx-xxxx'
+                    inputMode='tel'
                     errors={errors}
                     register={register}
                     rules={{
-                      required: '電話為必填',
-                      minLength: {
-                        value: 6,
-                        message: '電話不少於 6 碼'
+                      required: '聯絡電話為必填',
+                      setValueAs: (v) => (v ? String(v).replace(/\D/g, '') : v), // 提交前只留數字
+                      pattern: {
+                        // 手機: 09開頭+8碼; 市話: 0開頭+1~2碼區碼+6~8碼
+                        value: /^(09\d{8}|0\d{1,2}\d{6,8})$/,
+                        message: '請輸入有效的手機或市話號碼',
                       },
-                      maxLength: {
-                        value: 12,
-                        message: '電話不超過 12 碼'
-                      }
                     }}
-                  ></Input>
+                  />
                 </div>
                 <div className="mb-2">
                   <Input
