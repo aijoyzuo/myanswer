@@ -29,6 +29,25 @@ const authorItem = [//authorItem 是一個 不會變動的靜態資料（常數�
   }
 ]
 
+const categoryLogos = {
+  "CREEKHEAL": "https://images.plurk.com/3qToDwfCJ5tKRJmdKVoxAd.png ",
+  "CW": "https://images.plurk.com/3ePDBpCbbFGMCSZaXpaaj8.png ",
+  "安若淨": "https://images.plurk.com/1veIPKryoFI4q7hdnsf805.png ",
+  "TEOXANE": "https://images.plurk.com/3iFHQAPGHVDd6QiuR7GjPs.png ",
+  "未分類": "https://dummyimage.com/240x240/eeeeee/444444&text=分類"
+};
+
+// 清理分類字串（去除多餘空白/換行）
+const normalizeCategory = (s) => (s ?? "")
+  .replace(/\s+/g, " ")
+  .trim();
+
+// 想固定顯示順序就用這個（找不到的放到後面）
+const categoryOrder = ["CREEKHEAL", "CW", "安若淨", "TEOXANE"];
+const sortByPreset = (arr, order) => {
+  const index = new Map(order.map((k, i) => [k, i]));
+  return [...arr].sort((a, b) => (index.has(a.name) ? index.get(a.name) : 999) - (index.has(b.name) ? index.get(b.name) : 999));
+};
 // 產品分類 Grid（從 products 自動彙總 category）
 function CategoryGrid({ categories }) {
   return (
@@ -36,19 +55,35 @@ function CategoryGrid({ categories }) {
       <h2 className="fw-bold mb-3">探索分類</h2>
       <div className="row g-3">
         {categories.map((c) => (
-          <div key={c.name} className="col-6 col-md-3">
-            <Link to={`/products?category=${encodeURIComponent(c.name)}`} className="text-decoration-none d-block">
-              <div className="ratio ratio-1x1 rounded overflow-hidden mb-2 bg-light">
-                <img
-                  src={c.imageUrl}
-                  alt={c.name}
-                  className="w-100 h-100 object-fit-cover"
-                  loading="lazy"
-                />
+          <div key={c.name} className="col-6 col-md-3 text-center">
+            <Link
+              to={`/products?category=${encodeURIComponent(c.name)}`}
+              className="text-decoration-none d-block category-pill"
+            >
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center bg-light mb-2"
+                style={{
+                  width: "120px",
+                  height: "120px",
+                  margin: "0 auto",
+                  overflow: "hidden",
+                  boxShadow: "0 0 0 1px rgba(0,0,0,.06)",
+                  transition: "transform .15s ease"
+                }}
+              >
+                {c.logoUrl ? (
+                  <img
+                    src={c.logoUrl}
+                    alt={c.name}
+                    loading="lazy"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <span className="fw-bold">{c.name}</span>
+                )}
               </div>
-              <div className="d-flex align-items-center justify-content-between">
-                <span className="fw-semibold text-dark">{c.name}</span>
-                {c.count != null && <small className="text-muted">{c.count} 件</small>}
+              <div className="d-flex flex-column align-items-center">
+                <span className="fw-semibold text-dark">{c.name}</span>               
               </div>
             </Link>
           </div>
@@ -57,35 +92,7 @@ function CategoryGrid({ categories }) {
     </section>
   );
 }
-// 熱門商品（目前先取前 6 件；未來可改用 isFeatured/hot 等旗標）
-function HotProducts({ items }) {
-  return (
-    <section className="container my-7">
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <h2 className="fw-bold mb-0">熱門商品</h2>
-        <Link to="/products" className="text-decoration-none">看全部</Link>
-      </div>
-      <div className="row g-4">
-        {items.slice(0, 6).map(product => (
-          <div key={product.id} className="col-6 col-md-4 col-lg-2">
-            <Link to={`/product/${product.id}`} className="text-decoration-none">
-              <div className="ratio ratio-1x1 rounded overflow-hidden bg-light">
-                <img
-                  src={product.imageUrl}
-                  alt={product.title}
-                  className="w-100 h-100 object-fit-cover"
-                  loading="lazy"
-                />
-              </div>
-              <h5 className="mt-2 text-dark text-truncate">{product.title}</h5>
-              <small className="text-muted">{product.category}</small>
-            </Link>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+
 
 // 訂閱電子報（頁面內 + 簡易驗證 + 蜜罐）
 function NewsletterInline() {
@@ -171,17 +178,26 @@ export default function Home() {
   useEffect(() => {
     getProducts(1)
   }, []);
-  // 由 products 動態彙總分類
-  const categories = Array.from(
+  // 由 products 動態彙總分類（改為使用品牌 LOGO）
+  let categories = Array.from(
     products.reduce((map, p) => {
-      const key = p.category || '未分類';
-      if (!map.has(key)) map.set(key, { name: key, count: 0, imageUrl: p.imageUrl });
-      const entry = map.get(key);
-      entry.count += 1;
-      // 代表圖：先用第一個遇到的商品圖
+      const raw = p.category || '未分類';
+      const key = normalizeCategory(raw);
+      if (!map.has(key)) {
+        map.set(key, {
+          name: key,
+          count: 0,
+          logoUrl: categoryLogos[key] || categoryLogos['未分類'],
+        });
+      }
+      map.get(key).count += 1;
       return map;
     }, new Map()).values()
   );
+
+  // 可選：依預設順序排列（CREEKHEAL → CW → 安若淨 → TEOXANE → 其他）
+  categories = sortByPreset(categories, categoryOrder);
+
 
 
 
@@ -268,10 +284,8 @@ export default function Home() {
       {/* 2) 產品分類（新的） */}
       {categories.length > 0 && <CategoryGrid categories={categories} />}
 
-      {/* 3) 熱門商品（新的） */}
-      {products.length > 0 && <HotProducts items={products} />}
-
-      {/*<div className="row">
+      <h2 className="fw-bold pt-3 pb-2">熱門商品</h2>
+      <div className="row">
         {products.slice(0, 3).map((product) => (
 
           <div className="col-md-4" key={product.id}>
@@ -287,7 +301,7 @@ export default function Home() {
             </Link>
           </div>
         ))}
-      </div>*/}
+      </div>
 
     </div >
     <div className="bg-light pt-7 pb-5">
