@@ -35,7 +35,7 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
       setDate(new Date());//在編輯時抓到最後一次設定的時間
     } else if (type === 'edit') {
       setTempData(tempCoupon);
-      setDate(new Date(tempCoupon.due_date));//在編輯時抓到該優惠券原設定的時間
+      setDate(new Date(tempCoupon.due_date * 1000));//在編輯時抓到該優惠券原設定的時間
     }
   }, [type, tempCoupon]);//只要 type 或 tempCoupon 發生變化，就會重新執行這段邏輯。
 

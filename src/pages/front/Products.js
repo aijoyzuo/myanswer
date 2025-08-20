@@ -5,7 +5,7 @@ import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
 import useWishList from "../../hook/useWishList";
 import Breadcrumbs from "../../components/Breadcrumbs";
-
+import { useToast } from '../../context/toastContext';
 
 
 
@@ -21,6 +21,8 @@ export default function Products() {
 
   const [categories, setCategories] = useState([]);
 
+  const toast = useToast(); // ✅ 取得全站 Toast API
+
   // 抽出：過濾商品的邏輯
   const filterProducts = (products, keyword) => {
     return products.filter((item) =>
@@ -32,35 +34,37 @@ export default function Products() {
   //  改寫 getProducts，用物件參數
   const getProducts = useCallback(async ({ page = 1, keyword = '' } = {}) => {
     setIsLoading(true);
+    try {
+      const url = keyword
+        ? `/v2/api/${process.env.REACT_APP_API_PATH}/products/all`
+        : `/v2/api/${process.env.REACT_APP_API_PATH}/products?page=${page}`;
 
-    const url = keyword
-      ? `/v2/api/${process.env.REACT_APP_API_PATH}/products/all`
-      : `/v2/api/${process.env.REACT_APP_API_PATH}/products?page=${page}`;
+      const res = await axios.get(url);
+      const allProducts = Object.values(res.data.products);
 
-    const res = await axios.get(url);
-    const allProducts = Object.values(res.data.products);
+      let filtered = allProducts;
 
+      if (keyword) {
+        filtered = filterProducts(allProducts, keyword);
 
-
-    let filtered = allProducts;
-
-    if (keyword) {
-      filtered = filterProducts(allProducts, keyword);
-
-      if (filtered.length === 0) {
-        setTimeout(() => {
-          setSearchKeyword('');
-          setSelectedCategory('');  //沒符合結果時，也把 active 狀態清空
-          setProducts(allProducts);
-        }, 2000);
+        if (filtered.length === 0) {
+          setTimeout(() => {
+            setSearchKeyword('');
+            setSelectedCategory('');
+            setProducts(allProducts);
+          }, 2000);
+        }
       }
+
+      setProducts(filtered);
+      setPagination(res.data.pagination || {});
+    } catch (error) {
+      console.error(error);
+      toast.error('載入產品失敗');
+    } finally {
+      setIsLoading(false);
     }
-
-
-    setProducts(filtered);
-    setPagination(res.data.pagination || {});
-    setIsLoading(false);
-  }, []);
+  }, [toast]);
 
   //品牌按鈕
   const getAllCategories = useCallback(async () => {
@@ -70,27 +74,27 @@ export default function Products() {
       const allCategories = [...new Set(allProducts.map(p => p.category))];
       setCategories(allCategories);
     } catch (error) {
-      console.error("無法取得全部產品分類", error);
+      toast.error('載入分類失敗');
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     getProducts({ page: 1 });
     getAllCategories();
   }, [getProducts, getAllCategories]);
 
+
   const addToCart = async (product, qty = 1) => {
-    const data = {
-      data: {
-        product_id: product.id,
-        qty: qty,
-      },
-    };
+    const data = { data: { product_id: product.id, qty } };
     setIsLoading(true);
     try {
       await axios.post(`/v2/api/${process.env.REACT_APP_API_PATH}/cart`, data);
-      getCart();
+      await getCart(); // 更新購物車
+      // 成功吐司：帶產品名更友善
+      toast.success(`已加入購物車：${product.title}`);
     } catch (error) {
+      const msg = error?.response?.data?.message || '加入購物車失敗';
+      toast.error(msg); // 失敗吐司
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -188,7 +192,7 @@ export default function Products() {
                         e.stopPropagation();    // 阻止事件往上冒泡到 <Link>
                         toggleWish(product.id);
                       }}
-                      style={{ right: '16px', top: '16px', position: 'absolute', cursor: 'pointer',width: '48px',display: 'flex', height: '48px',alignItems: 'flex-start',   justifyContent: 'flex-end'}}
+                      style={{ right: '16px', top: '16px', position: 'absolute', cursor: 'pointer', width: '48px', display: 'flex', height: '48px', alignItems: 'flex-start', justifyContent: 'flex-end' }}
                       aria-label={wishList.includes(product.id) ? '移出收藏' : '加入收藏'}
                       role="button"
                       tabIndex={0}

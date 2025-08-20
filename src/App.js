@@ -14,6 +14,7 @@ import Checkout from './pages/front/Checkout';
 import Success from './pages/front/Success';
 import WishList from './pages/front/WishList';
 import Services from './pages/front/Services';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 function App() {
 

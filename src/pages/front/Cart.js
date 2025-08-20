@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import StepIndicator from "../../components/StepIndicator";
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default function Cart() {
   const { cartData, getCart } = useOutletContext();
@@ -13,6 +15,14 @@ export default function Cart() {
   const navigate = useNavigate();
 
   const SHIPPING_FEE = 160;
+
+  const Toast = Swal.mixin({ //sweetalert
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+  });
 
   const removeCartItem = async (id) => {
     // 將該品項加入 loading 清單（防連點）
@@ -49,15 +59,51 @@ export default function Cart() {
   };
 
   const applyCoupon = async () => {
-    if (!couponCode || couponLoading) return;
+    const code = couponCode.trim();
+    if (!code || couponLoading) return;
     setCouponLoading(true);
     try {
-      await getCart(); // 重新取得購物車，讓折扣更新（你若有實際套用優惠券 API，可放在這裡）
-      alert("優惠券套用成功");
+      const res = await axios.post(
+        `/v2/api/${process.env.REACT_APP_API_PATH}/coupon`,
+        { data: { code } }
+      );
+
+      await getCart(); // 成功後讓 final_total 更新
+      await Toast.fire({
+        icon: 'success',
+        title: res?.data?.message || '優惠券套用成功',
+      });
     } catch (error) {
-      alert("優惠碼錯誤或已過期");
+      const msg =
+        error?.response?.data?.message ||
+        error?.message ||
+        '優惠碼錯誤或已過期';
+      await Swal.fire({
+        icon: 'error',
+        title: '套用失敗',
+        text: msg || '優惠碼錯誤或已過期',
+        confirmButtonText: '重試',
+        confirmButtonColor: '#000000ff'
+      });
     } finally {
       setCouponLoading(false);
+    }
+  };
+
+  const confirmRemove = async (item) => {
+    if (loadingItems.includes(item.id)) return; // 已在處理中就略過
+    const { isConfirmed } = await Swal.fire({
+      title: `要移除「${item.product.title}」嗎？`,
+      text: '移除後可再加入一次',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '移除',
+      cancelButtonText: '取消',
+      confirmButtonColor: '#dc3545',
+    });
+    if (isConfirmed) {
+      await removeCartItem(item.id);
+      await Toast.fire({ icon: 'success', title: '已移除' });
     }
   };
 
@@ -109,7 +155,7 @@ export default function Cart() {
                           type="button"
                           className="position-absolute btn"
                           style={{ top: "8px", right: "16px" }}
-                          onClick={() => removeCartItem(item.id)}
+                          onClick={() => confirmRemove(item)}
                           disabled={isLoading}           // ✅ 刪除按鈕防連點
                           aria-disabled={isLoading}
                         >
