@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useOutletContext, useParams, Link } from 'react-router-dom';
 import ImageSwiper from '../../components/ImageSwiper';
 import Loading from "../../components/Loading";
 import Breadcrumbs from '../../components/Breadcrumbs';
+import { useToast } from '../../context/toastContext';
 
 export default function ProductDetail() {
   const [product, setProduct] = useState({});
@@ -12,66 +13,80 @@ export default function ProductDetail() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const { id } = useParams();
   const { getCart } = useOutletContext();
+  const toast = useToast();
 
-  const getProduct = async () => {
-    setIsLoading(true);
-    try {
-      const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/product/${id}`);
-      const fetchedProduct = productRes.data.product;
-      setProduct(fetchedProduct);
-      getRelatedProducts(fetchedProduct.category, fetchedProduct.id);
-    } catch (error) {
-      console.error('取得商品失敗', error);
-    } finally {
-      setIsLoading(false); // ✅ 確保不論成功或錯誤都會關閉 loading
-    }
-  };
-
-  const getRelatedProducts = async (category, currentProductId) => {
+  // ------- data fetchers（非事件處理，不用 handle 前綴）-------
+  const getRelatedProducts = useCallback(async (category, currentProductId) => {
     try {
       const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/products/all`);
-      const allProducts = res.data.products;
+      const allProducts = Object.values(res.data.products ?? {});
       const related = allProducts
-        .filter(p => p.category === category && p.id !== currentProductId)
+        .filter((p) => p.category === category && p.id !== currentProductId)
         .slice(0, 3);
       setRelatedProducts(related);
     } catch (err) {
       console.log('取得相關產品失敗', err);
     }
-  };
+  }, []);
 
-  const addToCart = async () => {
-    const data = {
-      data: {
-        product_id: product.id,
-        qty: cartQuantity,
-      },
-    };
+  const getProduct = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/product/${id}`);
+      const fetchedProduct = productRes.data.product;
+      setProduct(fetchedProduct);
+      if (fetchedProduct?.category && fetchedProduct?.id) {
+        getRelatedProducts(fetchedProduct.category, fetchedProduct.id);
+      }
+    } catch (error) {
+      console.error('取得商品失敗', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, getRelatedProducts]);
+
+  // ------- effects -------
+  useEffect(() => {
+    const top = window.innerWidth >= 768 ? 140 : 0;
+    window.scrollTo({ top, behavior: 'smooth' });
+    if (id) getProduct();
+  }, [id, getProduct]);
+
+  // ------- handlers（事件處理一律 handle*）-------
+  const handleDecrementQty = () =>
+    setCartQuantity((pre) => (pre === 1 ? pre : pre - 1));
+
+  const handleIncrementQty = () =>
+    setCartQuantity((pre) => pre + 1);
+
+  const handleAddToCart = async () => {
+    if (!product?.id) {
+      toast.error('商品資訊尚未載入，請稍候再試');
+      return;
+    }
+    const qty = Number(cartQuantity) > 0 ? Number(cartQuantity) : 1;
+    const data = { data: { product_id: product.id, qty } };
+
     setIsLoading(true);
     try {
       await axios.post(`/v2/api/${process.env.REACT_APP_API_PATH}/cart`, data);
-      getCart();
+      await getCart();
+      toast.success(`已加入購物車：${product.title}`);
     } catch (error) {
-      console.log(error);
+      const msg = error?.response?.data?.message || '加入購物車失敗';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    const scrollTop = window.innerWidth >= 768 ? 140 : 0;
-    window.scrollTo({ top: scrollTop, behavior: 'smooth' });
-    getProduct(id);
-  }, [id]);
-
-
+  // ------- view helpers -------
   const allImages = [
     ...(product.imageUrl ? [product.imageUrl] : []),
-    ...(Array.isArray(product.imagesUrl) ? product.imagesUrl : [])
+    ...(Array.isArray(product.imagesUrl) ? product.imagesUrl : []),
   ];
 
   return (
-
     <>
       <div className="container">
         <Loading isLoading={isLoading} />
@@ -87,16 +102,17 @@ export default function ProductDetail() {
           {/* 右欄：文字說明 + 加入購物車 */}
           <div className="col-12 col-md-5">
             <h2 className="mb-2 fw-bold">{product.title}</h2>
-            <div className='d-flex align-items-center mb-3'>
+            <div className="d-flex align-items-center mb-3">
               <p className="text-muted mb-0">品牌：</p>
-              <p className="h6 text-white badge bg-primary d-inline-block mb-0">{product.category}</p>
+              <p className="h6 text-white badge bg-primary d-inline-block mb-0">
+                {product.category}
+              </p>
             </div>
 
             <div className="pb-3 border-bottom">
               <p className="mb-0">適用：</p>
               <p className="text-muted">{product.description}</p>
             </div>
-
 
             {/* 成分與使用方法說明 */}
             <div className="my-3">
@@ -107,14 +123,17 @@ export default function ProductDetail() {
                 <div className="text-muted">{product.content}</div>
               </div>
             </div>
-            <p className="fw-bold fs-5 text-end">NT${(product.price ?? 0).toLocaleString()}</p>
+
+            <p className="fw-bold fs-5 text-end">
+              NT${(product.price ?? 0).toLocaleString()}
+            </p>
 
             {/* 數量 + 加入購物車按鈕 */}
             <div className="input-group mb-3 border">
               <button
                 className="btn btn-outline-dark rounded-0 border-0 py-3"
                 type="button"
-                onClick={() => setCartQuantity((pre) => (pre === 1 ? pre : pre - 1))}
+                onClick={handleDecrementQty}
               >
                 <i className="bi bi-dash"></i>
               </button>
@@ -127,7 +146,7 @@ export default function ProductDetail() {
               <button
                 className="btn btn-outline-dark rounded-0 border-0 py-3"
                 type="button"
-                onClick={() => setCartQuantity((pre) => pre + 1)}
+                onClick={handleIncrementQty}
               >
                 <i className="bi bi-plus"></i>
               </button>
@@ -135,9 +154,9 @@ export default function ProductDetail() {
 
             <button
               type="button"
-              className="btn btn-primary text-white w-100 py-3 rounded-0  d-none d-md-block"
-              onClick={addToCart}
-              disabled={isLoading}
+              className="btn btn-primary text-white w-100 py-3 rounded-0 d-none d-md-block"
+              onClick={handleAddToCart}
+              disabled={isLoading || !product?.id}
             >
               加入購物車
             </button>
@@ -148,7 +167,7 @@ export default function ProductDetail() {
         {relatedProducts.length > 0 && (
           <div className="mt-5">
             <h4 className="mb-3 fw-bold">猜你也會喜歡</h4>
-            <hr className="text-secondary"></hr>
+            <hr className="text-secondary" />
             <div className="row">
               {relatedProducts.map((item) => (
                 <div className="col-4 mb-4" key={item.id}>
@@ -158,7 +177,7 @@ export default function ProductDetail() {
                         src={item.imageUrl}
                         className="card-img-top object-fit-contain"
                         alt={item.title}
-                        style={{ height: "200px", objectFit: "cover" }}
+                        style={{ height: '200px', objectFit: 'cover' }}
                       />
                       <div className="card-body p-2">
                         <h6 className="card-title text-truncate mb-1">{item.title}</h6>
@@ -175,21 +194,21 @@ export default function ProductDetail() {
           </div>
         )}
       </div>
+
       {/* 手機版購物車按鈕 */}
       <div className="d-md-none">
         <div className="fixed-bottom border-top shadow">
           <button
             type="button"
             className="btn btn-primary w-100 rounded-0 text-white"
-            onClick={addToCart}
-            disabled={isLoading}
-            style={{ height: "48px" }}
+            onClick={handleAddToCart}
+            disabled={isLoading || !product?.id}
+            style={{ height: '48px' }}
           >
             加入購物車
           </button>
         </div>
       </div>
-
     </>
   );
 }

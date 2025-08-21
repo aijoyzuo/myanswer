@@ -98,7 +98,7 @@ function CategoryGrid({ categories }) {
 function NewsletterInline() {
   const { register, handleSubmit, formState: { errors, isSubmitting, isSubmitSuccessful } } = useForm({ mode: 'onTouched' });
 
-  const onSubmit = async ({ email, hp }) => {
+  const handleNewsletterSubmit = async ({ email, hp }) => {
     if (hp) return; // 蜜罐（機器人常會填）
     // TODO: 呼叫你的訂閱 API（或表單服務，如 Mailchimp, Brevo, Klaviyo 等）
     await new Promise(r => setTimeout(r, 400)); // demo：模擬 API 延遲
@@ -115,7 +115,7 @@ function NewsletterInline() {
             {isSubmitSuccessful ? (
               <p className="text-center">感謝訂閱！請到信箱點擊確認連結</p>
             ) : (
-              <form className="row g-2 justify-content-center justify-content-md-start" onSubmit={handleSubmit(onSubmit)} noValidate>
+              <form className="row g-2 justify-content-center justify-content-md-start" onSubmit={handleSubmit(handleNewsletterSubmit)} noValidate>
                 <div className="col-9">
                   <input
                     type="email"
@@ -156,6 +156,10 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // ✅ handler：開/關 Modal
+  const handleOpenModal  = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   useEffect(() => {
     const carouselEl = document.querySelector('#carouselExampleControls');
@@ -225,7 +229,7 @@ export default function Home() {
           <div className="d-grid d-md-block text-end">
             <button
               className="btn btn-outline-primary mt-3"
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleOpenModal}
             >
               LINE 預約諮詢
             </button>
@@ -333,7 +337,7 @@ export default function Home() {
     <NewsletterInline />
 
 
-    <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)} backdrop="static" centered>
+    <Modal show={isModalOpen} onHide={handleCloseModal} backdrop="static" centered>
       <Modal.Header closeButton className="bg-primary">
         <Modal.Title className="text-white">LINE 預約諮詢</Modal.Title>
       </Modal.Header>
@@ -342,7 +346,7 @@ export default function Home() {
         <img src="https://images.plurk.com/79bOdl5KL7nxzsyrLvan8N.jpg" alt="LINE QR Code" style={{ maxWidth: '100%' }} />
       </Modal.Body>
       <Modal.Footer className="d-flex justify-content-center  border-0">
-        <Button variant="primary" className="w-100" onClick={() => setIsModalOpen(false)}>
+        <Button variant="primary" className="w-100" onClick={handleCloseModal}>
           已成為好友
         </Button>
       </Modal.Footer>

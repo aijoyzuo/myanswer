@@ -6,17 +6,20 @@ import { useOutletContext } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Loading from '../../components/Loading';
 import Breadcrumbs from "../../components/Breadcrumbs";
+import { useToast } from '../../context/toastContext';
 
 
 
 export default function WishList() {
-    const { wishList, toggleWish } = useWishList();
+    const { wishList, handleToggleWish } = useWishList();
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);//加入購物車
     const { getCart } = useOutletContext();//外層傳進來的功能//加入購物車
 
+    const toast = useToast(); // ✅ 取得全站 Toast API
+
     useEffect(() => {
-        
+
         const getAllProducts = async () => {
             setIsLoading(true);
             const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/products/all`);
@@ -28,26 +31,21 @@ export default function WishList() {
         getAllProducts();
     }, [wishList]);
 
-    const addToCart = async (product) => { //加入購物車
-        const data = {
-            data: {
-                product_id: product.id,
-                qty: 1
-            },
-        };
+    const handleAddToCart = async (product, qty = 1) => {
+        const data = { data: { product_id: product.id, qty } };
         setIsLoading(true);
         try {
-            const res = await axios.post(`/v2/api/${process.env.REACT_APP_API_PATH}/cart`,
-                data
-            );
-            console.log('加入購物車', res);
-            getCart();
-            setIsLoading(false);
+            await axios.post(`/v2/api/${process.env.REACT_APP_API_PATH}/cart`, data);
+            await getCart(); // 更新購物車
+            // 成功吐司：帶產品名更友善
+            toast.success(`已加入購物車：${product.title}`);
         } catch (error) {
-            console.log(error);
+            const msg = error?.response?.data?.message || '加入購物車失敗';
+            toast.error(msg); // 失敗吐司      
+        } finally {
             setIsLoading(false);
         }
-    }
+    };
 
 
     return (
@@ -67,15 +65,15 @@ export default function WishList() {
                         {products.map((product) => (
                             <div className="col-md-3" key={product.id}>
                                 <div className="card border-0 h-100 position-relative">
-                                    <img src={product.imageUrl} alt="" className="card-img-top wishlist-img"  />
+                                    <img src={product.imageUrl} alt="" className="card-img-top wishlist-img" />
                                     <div className="card-body d-flex flex-column text-center">
                                         <h5>{product.title}</h5>
                                         <p className="text-muted">{product.category}</p>
                                         <p>NT${product.price}</p>
-                                        <button className="btn btn-outline-primary mt-auto rounded-0" onClick={() => toggleWish(product.id)}>取消收藏</button>
+                                        <button className="btn btn-outline-primary mt-auto rounded-0" onClick={() => handleToggleWish(product.id)}>取消收藏</button>
                                         <button className="btn btn-primary mt-2 rounded-0"
-                                            onClick={() => addToCart(product)}
-                                            disabled={isLoading}>加入購物車</button>
+                                            onClick={() => handleAddToCart(product, 1)}   // <-- 重要
+                                            disabled={isLoading || !product?.id}>加入購物車</button>
                                     </div>
                                 </div>
                             </div>

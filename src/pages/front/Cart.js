@@ -4,7 +4,7 @@ import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import StepIndicator from "../../components/StepIndicator";
 import Swal from 'sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
+
 
 export default function Cart() {
   const { cartData, getCart } = useOutletContext();

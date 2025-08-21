@@ -31,8 +31,13 @@ export default function Products() {
     );
   };
 
+  const scrollToTop = () => { // 換頁滾到最上面
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   //  改寫 getProducts，用物件參數
   const getProducts = useCallback(async ({ page = 1, keyword = '' } = {}) => {
+    scrollToTop();
     setIsLoading(true);
     try {
       const url = keyword
@@ -94,11 +99,17 @@ export default function Products() {
       toast.success(`已加入購物車：${product.title}`);
     } catch (error) {
       const msg = error?.response?.data?.message || '加入購物車失敗';
-      toast.error(msg); // 失敗吐司
-      console.log(error);
+      toast.error(msg); // 失敗吐司      
     } finally {
       setIsLoading(false);
     }
+  };
+
+
+  const normalize = (s) => (s ?? '').toString().trim().toLowerCase();
+  const matchCategory = (kw) => {
+    const n = normalize(kw);
+    return categories.find((c) => normalize(c) === n) || '';
   };
 
 
@@ -149,16 +160,20 @@ export default function Products() {
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    setSelectedCategory('');
-                    getProducts({ page: 1, keyword: searchKeyword }); // 強制回第一頁
+                    const kw = searchKeyword;
+                    const matched = matchCategory(kw);
+                    setSelectedCategory(matched);           // ✅ 讓品牌按鈕變 active
+                    getProducts({ page: 1, keyword: kw });  // 一樣用關鍵字做過濾
                   }
                 }} />
               <button className="btn btn-primary rounded-0 text-white"
                 type="button"
                 onClick={() => {
-                  setSelectedCategory('');
-                  getProducts({ page: 1, keyword: searchKeyword })
-                }} //搜尋時自動 reset 分頁
+                  const kw = searchKeyword;
+                  const matched = matchCategory(kw);
+                  setSelectedCategory(matched);           // ✅
+                  getProducts({ page: 1, keyword: kw });  // ✅
+                }}//搜尋時自動 reset 分頁
               >
                 搜尋
               </button>

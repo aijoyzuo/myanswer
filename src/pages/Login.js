@@ -19,7 +19,7 @@ export default function Login() {
     setData({ ...data, [name]: value });//中括號是因為他是動態的，我有username跟password兩種[name]屬性的資料
   }
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); //避免表單刷新
     try {
       const res = await axios.post('/v2/admin/signin', data);//發送 POST 請求 到後端登入 API（路徑是 /v2/admin/signin，data是我的登入資訊）
@@ -50,7 +50,7 @@ export default function Login() {
           {loginState.message}
         </div>
 
-        <form onSubmit={submit}>
+        <form onSubmit={handleSubmit}>
           <div className="mb-2">
             <label htmlFor="email" className="form-label w-100">
               Email
