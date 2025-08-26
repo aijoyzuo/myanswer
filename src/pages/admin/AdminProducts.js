@@ -17,16 +17,30 @@ export default function AdminProducts() {
     const deleteModal = useRef(null);
 
     useEffect(() => {
-        productModal.current = new Modal('#productModal', {// 依照元件的id，建立一個 Modal 實體並儲存在 useRef 回傳的物件中(這個物件存在productModal這個變數中)。
-            backdrop: 'static',//按旁邊不會關掉
-            keyboard: false    //按esc不會關掉
-        });
-        deleteModal.current = new Modal('#deleteModal', {
-            backdrop: 'static',
-            keyboard: false
-        });
+        const productEl = document.getElementById('productModal');
+        const deleteEl = document.getElementById('deleteModal');
+
+        if (productEl) {
+            productModal.current = new Modal(productEl, {
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+        if (deleteEl) {
+            deleteModal.current = new Modal(deleteEl, {
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+
         getProducts();
+
+        return () => {
+            productModal.current?.dispose();
+            deleteModal.current?.dispose();
+        };
     }, []);
+
 
     const getProducts = async (page = 1) => { //如果沒有帶入參數page，預設值為1
         const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/admin/products?page=${page}`);//問號用來查詢參數

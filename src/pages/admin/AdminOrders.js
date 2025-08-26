@@ -3,6 +3,7 @@ import axios from "axios";
 import OrderModal from "../../components/OrderModal";
 import Pagination from "../../components/Pagination";
 import { Modal } from "bootstrap"; // 引入Modal模組
+import Swal from "sweetalert2";
 
 
 export default function AdminOrders() {
@@ -13,12 +14,22 @@ export default function AdminOrders() {
   const orderModal = useRef(null);//我建立了一個 ref(參考物件)，他的初始值是 null(格式：{current:null})
 
   useEffect(() => {
-    orderModal.current = new Modal('#orderModal', {// 依照元件的id，建立一個 Modal 實體並儲存在 useRef 回傳的物件中(這個物件存在productModal這個變數中)。
-      backdrop: 'static',//按旁邊不會關掉
-      keyboard: false    //按esc不會關掉
-    });
+    const orderEl = document.getElementById('orderModal');
+
+    if (orderEl) {
+      orderModal.current = new Modal(orderEl, {
+        backdrop: 'static',
+        keyboard: false
+      });
+    }
+
     getOrders();
+
+    return () => {
+      orderModal.current?.dispose();
+    };
   }, []);
+
 
   const getOrders = async (page = 1) => { //如果沒有帶入參數page，預設值為1
     const orderRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/admin/orders?page=${page}`);//問號用來查詢參數
@@ -108,13 +119,26 @@ export default function AdminOrders() {
                     type='button'
                     className='btn btn-outline-danger btn-sm'
                     onClick={() => {
-                      if (window.confirm("確定要刪除這筆訂單嗎？")) {
-                        deleteOrder(order.id);
-                      }
+                      Swal.fire({
+                        title: '確定要刪除嗎？',
+                        text: "刪除後就無法恢復了！",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '確認刪除',
+                        cancelButtonText: '取消'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          deleteOrder(order.id);
+                          Swal.fire('刪除成功！', '該訂單已被刪除。', 'success');
+                        }
+                      });
                     }}
                   >
                     刪除
                   </button>
+
                 </td>
               </tr>
             );

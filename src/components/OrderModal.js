@@ -30,7 +30,7 @@ export default function OrderModal({ closeProductModal, getOrders, tempOrder }) 
     }
   };
 
-  const submit = async () => {
+  const handleSubmit = async () => {
     setIsLoading(true);
     try {
       let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/order/${tempOrder.id}`;
@@ -188,7 +188,7 @@ export default function OrderModal({ closeProductModal, getOrders, tempOrder }) 
             >
               關閉
             </button>
-            <button type='button' className='btn btn-primary' onClick={submit}>
+            <button type='button' className='btn btn-primary' onClick={handleSubmit}>
               儲存
             </button>
           </div>

@@ -60,14 +60,14 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
     }
   };
 
-  const submit = async () => {//把剛剛填進去的所有輸入資料（tempData）透過 axios 傳送到後端 API
+  const handleSubmit = async () => {//把剛剛填進去的所有輸入資料（tempData）透過 axios 傳送到後端 API
     try {
       let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon`
       let method = 'post';
       if (type === 'edit') {
         api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${tempCoupon.id}`;
         method = 'put';
-      }//執行submit的時候他會先確認是要新增還是編輯，進而變更串接api的方式
+      }//執行handleSubmit的時候他會先確認是要新增還是編輯，進而變更串接api的方式
       const res = await axios[method](
         api,
         {
@@ -78,7 +78,7 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
         });//此api要求把資料包在一個 data 欄位裡，而tempData必須是個物件
 
       handleSuccessMessage(dispatch, res);
-      closeModal();//submit之後關閉modal
+      closeModal();//handleSubmit之後關閉modal
       getCoupons();//並重新取得遠端資料
     } catch (error) {
 
@@ -173,7 +173,7 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={closeModal} >關閉</button>
             {/*把data-bs-dismiss改成onClick={closeModal} */}
-            <button type="button" className="btn btn-primary" onClick={submit}>儲存</button>
+            <button type="button" className="btn btn-primary" onClick={handleSubmit}>儲存</button>
           </div>
         </div>
       </div>
