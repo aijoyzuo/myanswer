@@ -4,6 +4,7 @@ import ProductModal from "../../components/ProductModal";
 import DeleteModal from "../../components/DeleteModal";
 import Pagination from "../../components/Pagination";
 import { Modal } from "bootstrap"; // 引入Modal模組
+import Swal from "sweetalert2";
 
 
 export default function AdminProducts() {
@@ -44,7 +45,7 @@ export default function AdminProducts() {
 
     const getProducts = async (page = 1) => { //如果沒有帶入參數page，預設值為1
         const productRes = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/admin/products?page=${page}`);//問號用來查詢參數
-        console.log("產品資料", productRes);
+
         setProducts(productRes.data.products);
         setPagination(productRes.data.pagination);
     }
@@ -73,7 +74,18 @@ export default function AdminProducts() {
                 deleteModal.current.hide();//並關閉Modal
             }
         } catch (error) {
-            console.log(error)
+            const msg =
+                error?.response?.data?.message ||
+                error?.message ||
+                "刪除過程發生錯誤，請稍後再試";
+            Swal.fire({
+                title: msg,
+                icon: "error",
+                toast: true,
+                position: "top",
+                timer: 2000,
+                showConfirmButton: false,
+            });
         }
     }
 

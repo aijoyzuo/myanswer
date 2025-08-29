@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import StepIndicator from "../../components/StepIndicator";
-import Swal from 'sweetalert2';
-
+import Swal from "sweetalert2";
 
 export default function Cart() {
   const { cartData, getCart } = useOutletContext();
@@ -16,25 +15,28 @@ export default function Cart() {
 
   const SHIPPING_FEE = 160;
 
-  const Toast = Swal.mixin({ //sweetalert
+  // SweetAlert2 - Toast 共用設定
+  const Toast = Swal.mixin({
     toast: true,
-    position: 'top-end',
+    position: "top-end",
     showConfirmButton: false,
     timer: 2000,
     timerProgressBar: true,
   });
 
   const removeCartItem = async (id) => {
-    // 將該品項加入 loading 清單（防連點）
-    setLoadingItems((prev) => [...prev, id]);
+    setLoadingItems((prev) => [...prev, id]); // 防連點
     try {
-      const res = await axios.delete(`/v2/api/${process.env.REACT_APP_API_PATH}/cart/${id}`);
+      await axios.delete(`/v2/api/${process.env.REACT_APP_API_PATH}/cart/${id}`);
       await getCart(); // 刪除後更新購物車
-      console.log("刪除後重新取得的結果", res);
+      await Toast.fire({ icon: "success", title: "已刪除購物車品項" });
     } catch (error) {
-      console.log(error);
+      await Toast.fire({
+        icon: "error",
+        title: "刪除失敗",
+        text: error?.response?.data?.message || error?.message || "請稍後再試",
+      });
     } finally {
-      // 無論成功或失敗，都把 loading 狀態移除
       setLoadingItems((prev) => prev.filter((x) => x !== id));
     }
   };
@@ -48,11 +50,18 @@ export default function Cart() {
     };
     setLoadingItems((prev) => [...prev, item.id]);
     try {
-      const res = await axios.put(`/v2/api/${process.env.REACT_APP_API_PATH}/cart/${item.id}`, data);
+      await axios.put(
+        `/v2/api/${process.env.REACT_APP_API_PATH}/cart/${item.id}`,
+        data
+      );
       await getCart();
-      console.log("新增", res);
+      await Toast.fire({ icon: "success", title: "已更新數量" });
     } catch (error) {
-      console.log(error);
+      await Toast.fire({
+        icon: "error",
+        title: "更新失敗",
+        text: error?.response?.data?.message || error?.message || "請稍後再試",
+      });
     } finally {
       setLoadingItems((prev) => prev.filter((x) => x !== item.id));
     }
@@ -67,23 +76,22 @@ export default function Cart() {
         `/v2/api/${process.env.REACT_APP_API_PATH}/coupon`,
         { data: { code } }
       );
-
       await getCart(); // 成功後讓 final_total 更新
       await Toast.fire({
-        icon: 'success',
-        title: res?.data?.message || '優惠券套用成功',
+        icon: "success",
+        title: res?.data?.message || "優惠券套用成功",
       });
     } catch (error) {
       const msg =
         error?.response?.data?.message ||
         error?.message ||
-        '優惠碼錯誤或已過期';
+        "優惠碼錯誤或已過期";
       await Swal.fire({
-        icon: 'error',
-        title: '套用失敗',
-        text: msg || '優惠碼錯誤或已過期',
-        confirmButtonText: '重試',
-        confirmButtonColor: '#000000ff'
+        icon: "error",
+        title: "套用失敗",
+        text: msg,
+        confirmButtonText: "重試",
+        confirmButtonColor: "#000000ff",
       });
     } finally {
       setCouponLoading(false);
@@ -94,16 +102,16 @@ export default function Cart() {
     if (loadingItems.includes(item.id)) return; // 已在處理中就略過
     const { isConfirmed } = await Swal.fire({
       title: `要移除「${item.product.title}」嗎？`,
-      text: '移除後可再加入一次',
-      icon: 'warning',
+      text: "移除後可再加入一次",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: '移除',
-      cancelButtonText: '取消',
-      confirmButtonColor: '#dc3545',
+      confirmButtonText: "移除",
+      cancelButtonText: "取消",
+      confirmButtonColor: "#dc3545",
     });
     if (isConfirmed) {
       await removeCartItem(item.id);
-      await Toast.fire({ icon: 'success', title: '已移除' });
+      await Toast.fire({ icon: "success", title: "已移除" });
     }
   };
 
@@ -111,13 +119,15 @@ export default function Cart() {
     if (isCheckingOut) return; // 防止重複點擊
     setIsCheckingOut(true);
     try {
-      // 若這一頁會先打「結帳」相關 API，可在這裡呼叫；現在先直接導向 checkout 頁
       navigate("../checkout");
     } catch (error) {
-      console.log(error);
-      setIsCheckingOut(false);
-    }
-    // 注意：navigate 會換頁，通常不會回來；若有需要留在本頁處理錯誤，再依需求調整
+      await Toast.fire({
+        icon: "error",
+        title: "前往結帳失敗",
+        text: error?.response?.data?.message || error?.message || "請稍後再試",
+      });
+      setIsCheckingOut(false);    }
+   
   };
 
   return (
@@ -156,18 +166,25 @@ export default function Cart() {
                           className="position-absolute btn"
                           style={{ top: "8px", right: "16px" }}
                           onClick={() => confirmRemove(item)}
-                          disabled={isLoading}           // ✅ 刪除按鈕防連點
+                          disabled={isLoading}
                           aria-disabled={isLoading}
                         >
                           {isLoading ? (
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span
+                              className="spinner-border spinner-border-sm"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
                           ) : (
                             <i className="bi bi-x"></i>
                           )}
                         </button>
 
                         <p className="mb-0 fw-bold">{item.product.title}</p>
-                        <p className="mt-1 mb-1 text-muted" style={{ fontSize: "14px" }}>
+                        <p
+                          className="mt-1 mb-1 text-muted"
+                          style={{ fontSize: "14px" }}
+                        >
                           {item.product.description}
                         </p>
 
@@ -176,7 +193,7 @@ export default function Cart() {
                             <select
                               className="form-select"
                               value={item.qty}
-                              disabled={isLoading}        // ✅ 更新數量時也禁用（你原本已做，這裡沿用 isLoading）
+                              disabled={isLoading}
                               onChange={(e) =>
                                 updateCartItem(item, Number(e.target.value))
                               }
@@ -206,7 +223,7 @@ export default function Cart() {
                       placeholder="輸入優惠碼享折扣"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
-                      disabled={couponLoading} // ✅ 套券期間禁用輸入
+                      disabled={couponLoading}
                     />
                   </div>
                   <div className="col-5">
@@ -214,11 +231,15 @@ export default function Cart() {
                       className="btn btn-dark btn-block rounded-0 py-1 w-100"
                       type="button"
                       onClick={applyCoupon}
-                      disabled={!couponCode || couponLoading} // ✅ 防連點
+                      disabled={!couponCode || couponLoading}
                     >
                       {couponLoading ? (
                         <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <span
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
                           套用中…
                         </>
                       ) : (
@@ -231,7 +252,10 @@ export default function Cart() {
                 <table className="table mt-1 text-muted">
                   <tbody>
                     <tr>
-                      <th scope="row" className="border-0 px-0 font-weight-normal">
+                      <th
+                        scope="row"
+                        className="border-0 px-0 font-weight-normal"
+                      >
                         小計
                       </th>
                       <td className="text-end border-0 px-0">
@@ -239,15 +263,24 @@ export default function Cart() {
                       </td>
                     </tr>
                     <tr>
-                      <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">
+                      <th
+                        scope="row"
+                        className="border-0 px-0 pt-0 font-weight-normal"
+                      >
                         套用優惠券
                       </th>
                       <td className="text-end border-0 px-0 pt-0">
-                        -NT${(cartData.total - cartData.final_total)?.toLocaleString()}
+                        -NT$
+                        {(
+                          cartData.total - cartData.final_total
+                        )?.toLocaleString()}
                       </td>
                     </tr>
                     <tr>
-                      <th scope="row" className="border-0 px-0 pt-0 font-weight-normal">
+                      <th
+                        scope="row"
+                        className="border-0 px-0 pt-0 font-weight-normal"
+                      >
                         運費
                       </th>
                       <td className="text-end border-0 px-0 pt-0">
@@ -260,11 +293,14 @@ export default function Cart() {
                 <div className="d-flex justify-content-between mt-4">
                   <p className="mb-0 h4 fw-bold">結帳總金額</p>
                   <p className="mb-0 h4 fw-bold">
-                    NT${Math.ceil(cartData.final_total + SHIPPING_FEE).toLocaleString()}
+                    NT$
+                    {Math.ceil(
+                      cartData.final_total + SHIPPING_FEE
+                    ).toLocaleString()}
                   </p>
                 </div>
 
-                {/* ✅ 替換 Link 為 button，點擊後先禁用再導頁，避免重複點擊 */}
+                {/* 桌機版：固定在內容下方 */}
                 <button
                   onClick={handleCheckout}
                   className="fw-bold btn btn-primary text-white btn-block mt-4 rounded-0 py-3 w-100 d-none d-md-block"
@@ -273,7 +309,11 @@ export default function Cart() {
                 >
                   {isCheckingOut ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       前往結帳…
                     </>
                   ) : (
@@ -281,6 +321,7 @@ export default function Cart() {
                   )}
                 </button>
 
+                {/* 手機版：固定在底部 */}
                 <button
                   onClick={handleCheckout}
                   className="fw-bold btn btn-primary text-white rounded-0 w-100 fixed-bottom d-block d-md-none"
@@ -290,7 +331,11 @@ export default function Cart() {
                 >
                   {isCheckingOut ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       前往結帳…
                     </>
                   ) : (

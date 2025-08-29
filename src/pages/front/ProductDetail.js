@@ -25,9 +25,10 @@ export default function ProductDetail() {
         .slice(0, 3);
       setRelatedProducts(related);
     } catch (err) {
-      console.log('取得相關產品失敗', err);
+      const msg = err?.response?.data?.message || err?.message || '取得相關產品失敗';
+      toast.error(msg);
     }
-  }, []);
+  }, [toast]);
 
   const getProduct = useCallback(async () => {
     setIsLoading(true);
@@ -39,11 +40,12 @@ export default function ProductDetail() {
         getRelatedProducts(fetchedProduct.category, fetchedProduct.id);
       }
     } catch (error) {
-      console.error('取得商品失敗', error);
+      const msg = error?.response?.data?.message || error?.message || '取得商品失敗';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
-  }, [id, getRelatedProducts]);
+  }, [id, getRelatedProducts, toast]);
 
   // ------- effects -------
   useEffect(() => {

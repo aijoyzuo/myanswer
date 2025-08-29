@@ -1,17 +1,11 @@
-//「console」只會在開發環境（npm start）輸出；npm run build 後的 production 版不會印出一般 log
+// src/pages/admin/AdminCoupons.jsx
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import CouponModal from "../../components/CouponModal";
 import DeleteModal from "../../components/DeleteModal";
 import Pagination from "../../components/Pagination";
 import { Modal } from "bootstrap";
-
-// 小工具：只在開發環境印出 log（CRA）
-const devLog = (...args) => {
-  if (process.env.NODE_ENV !== "production") {
-    console.log(...args);
-  }
-};
+import Swal from "sweetalert2";
 
 export default function AdminCoupons() {
   const [coupons, setCoupons] = useState([]);
@@ -48,7 +42,26 @@ export default function AdminCoupons() {
       couponModal.current?.dispose();
       deleteModal.current?.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+ 
+
+  const alertError = (title, text = "") =>
+    Swal.fire({
+      title,
+      text,
+      icon: "error",
+      confirmButtonText: "確定",
+    });
+
+  const alertSuccess = (title, text = "") =>
+    Swal.fire({
+      title,
+      text,
+      icon: "success",
+      confirmButtonText: "好的",
+    });
 
   const getCoupons = async (page = 1) => {
     try {
@@ -57,9 +70,10 @@ export default function AdminCoupons() {
       );
       setCoupons(res.data.coupons || []);
       setPagination(res.data.pagination || {});
-      devLog("[GET] coupons 成功：", res.data);
-    } catch (error) {
-      console.error("[GET] coupons 失敗：", error);
+      // 如需提示可打開下面一行
+      // toast("已載入優惠券", "success");
+    } catch (err) {
+      alertError("載入優惠券失敗", "請稍後再試或聯絡管理員。");
     }
   };
 
@@ -76,10 +90,6 @@ export default function AdminCoupons() {
 
   const openDeleteModal = (coupon) => {
     setTempCoupon(coupon);
-    devLog("[DELETE] 打開刪除確認視窗：", {
-      id: coupon?.id,
-      title: coupon?.title,
-    });
     deleteModal.current?.show();
   };
 
@@ -89,23 +99,21 @@ export default function AdminCoupons() {
   };
 
   const deleteCoupon = async (id) => {
-    devLog("[DELETE] 準備刪除：", { id, title: tempCoupon?.title });
     try {
       const res = await axios.delete(
         `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${id}`
       );
-      devLog("[DELETE] API 回應：", res.data);
 
       if (res.data?.success) {
-        devLog("[DELETE] 刪除成功：", { id, title: tempCoupon?.title });
         await getCoupons();
         deleteModal.current?.hide();
         setTempCoupon({});
+        alertSuccess("刪除成功", "已移除該優惠券。");
       } else {
-        console.warn("[DELETE] 刪除失敗（success=false）：", res.data?.message);
+        alertError("刪除失敗", res.data?.message || "請稍後再試。");
       }
-    } catch (error) {
-      console.error("[DELETE] 刪除錯誤：", error);
+    } catch (err) {
+      alertError("刪除發生錯誤", "請稍後再試或聯絡管理員。");
     }
   };
 
