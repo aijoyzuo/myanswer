@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useOutletContext, } from "react-router-dom";
+import { Link, useOutletContext, useSearchParams, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
 import useWishList from "../../hook/useWishList";
@@ -16,6 +16,9 @@ export default function Products() {
   const [pagination, setPagination] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const { wishList, toggleWish } = useWishList();
+  const [searchParams] = useSearchParams();//讀取探索分類
+  const navigate = useNavigate();//讀取探索分類
+
 
   const { getCart } = useOutletContext();
 
@@ -84,9 +87,26 @@ export default function Products() {
   }, [toast]);
 
   useEffect(() => {
-    getProducts({ page: 1 });
     getAllCategories();
-  }, [getProducts, getAllCategories]);
+  }, [getAllCategories]);
+
+  useEffect(() => {
+    const raw = searchParams.get('category') || '';
+    const kw = raw.trim();
+
+    if (kw) {
+      // 不等 categories，比對 active 先設成 kw（視覺上就夠），避免再觸發第二次抓資料
+      setSelectedCategory(kw);
+      setSearchKeyword(kw);
+      getProducts({ page: 1, keyword: kw });
+    } else {
+      setSelectedCategory('');
+      setSearchKeyword('');
+      getProducts({ page: 1 });
+    }
+    // 依賴 searchParams + getProducts 就好，避免 categories 造成二次抓取
+  }, [searchParams, getProducts]);
+
 
 
   const addToCart = async (product, qty = 1) => {
@@ -106,7 +126,7 @@ export default function Products() {
   };
 
 
-  const normalize = (s) => (s ?? '').toString().trim().toLowerCase();
+  const normalize = (s) => (s ?? '').toString().replace(/\s+/g, ' ').trim().toLowerCase();
   const matchCategory = (kw) => {
     const n = normalize(kw);
     return categories.find((c) => normalize(c) === n) || '';
@@ -127,11 +147,12 @@ export default function Products() {
           <button
             className={`btn btn-sm ${selectedCategory === '' ? 'btn-primary' : 'btn-outline-primary'}`}
             onClick={() => {
-              setSelectedCategory('');            // 🆕 設為未選
-              setSearchKeyword('');               // 可選：清掉關鍵字
+              setSelectedCategory('');            // 設為未選
+              setSearchKeyword('');               // 清掉關鍵字
               getProducts({ page: 1 });
+              navigate('/products', { replace: true }); // 移除 ?category= 查詢參數
             }}
-            aria-pressed={selectedCategory === ''} // 可選：無障礙
+            aria-pressed={selectedCategory === ''} // 無障礙
           >
             全部品牌
           </button>
@@ -140,11 +161,12 @@ export default function Products() {
               key={cat}
               className={`btn btn-sm ${selectedCategory === cat ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => {
-                setSelectedCategory(cat);         // 🆕 設為選中
-                setSearchKeyword('');             // 可選：清掉關鍵字
+                setSelectedCategory(cat);         // 設為選中
+                setSearchKeyword('');             // 清掉關鍵字
                 getProducts({ page: 1, keyword: cat });
+                navigate(`/products?category=${encodeURIComponent(cat)}`, { replace: true });
               }}
-              aria-pressed={selectedCategory === cat} // 可選：無障礙
+              aria-pressed={selectedCategory === cat} //無障礙
             >
               {cat}
             </button>
@@ -251,7 +273,10 @@ export default function Products() {
 
       </div>
       <nav className="d-flex justify-content-center mt-3">
-        <Pagination pagination={pagination} changePage={getProducts} />
+        <Pagination //把數字轉成物件傳入
+          pagination={pagination}
+          changePage={(p) => getProducts({ page: p, keyword: selectedCategory || searchKeyword })}
+        />
       </nav>
     </div>
   </>)
