@@ -2,10 +2,6 @@ import { NavLink } from "react-router-dom";
 import { useRef } from "react";
 import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
 
-
-
-
-
 export default function Navbar({ cartData }) {
   const collapseRef = useRef(null);
 
@@ -31,7 +27,6 @@ export default function Navbar({ cartData }) {
 
   const getNavClass = ({ isActive }) =>
     'nav-link ps-0 text-decoration-none' + (isActive ? ' text-dark fw-bold' : '');
-
 
   return (
     <>
@@ -131,7 +126,6 @@ export default function Navbar({ cartData }) {
           </nav>
         </div>
       </div>
-
     </>
   )
 }

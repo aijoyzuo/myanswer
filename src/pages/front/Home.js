@@ -104,7 +104,7 @@ function NewsletterInline() {
     await new Promise(r => setTimeout(r, 400)); // demo：模擬 API 延遲
   };
   return (
-    <section className="bg-primary py-3 ">
+    <section className="bg-primary py-4 ">
       <div className="container">
         <div className="row">
           <div className="col-md-6">
