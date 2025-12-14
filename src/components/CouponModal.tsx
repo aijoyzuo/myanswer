@@ -1,23 +1,42 @@
-import axios from "axios";
-import { useEffect, useState, useContext } from "react";
-import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../context/messageContext";
+import axios, { AxiosRequestConfig, Method } from 'axios';
+import { useEffect, useState } from "react";
+import { useMessage, handleSuccessMessage, handleErrorMessage } from "../context/messageContext";
 
-const formatDateForInput = (date) => {
+/** 後端的優惠券結構（用到的欄位） */
+export interface Coupon {
+  id?: string | number;
+  title: string;
+  is_enabled: 0 | 1;       // 後端常見是 0/1
+  percent: number;         // 折扣（%）
+  due_date: number;        // Unix 秒（注意：是「秒」不是「毫秒」）
+  code: string;
+}
+
+/** 元件 props 型別 */
+type Props = {
+  closeModal: () => void;
+  getCoupons: () => void;
+  type: 'create' | 'edit';
+  tempCoupon: Coupon;
+};
+
+/** 將 Date 轉為 <input type="date"> 需要的 yyyy-MM-dd */
+const formatDateForInput = (date:Date):string => {
   const yyyy = date.getFullYear();
   const mm = (date.getMonth() + 1).toString().padStart(2, "0");
   const dd = date.getDate().toString().padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }) {
-  const [tempData, setTempData] = useState({
+export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }:Props) {
+  const [tempData, setTempData] = useState<Coupon>({
     title: "超優惠",
     is_enabled: 1,
     percent: 80,
     due_date: 1555459200,
     code: 'testCode',
   });
-  const [, dispatch] = useContext(MessageContext)
+  const { dispatch} = useMessage();
 
   //把input輸入的時間格式(2025-04-25)經過轉成new Date再轉成api的時間格式(unix timestamp)
   const [date, setDate] = useState(new Date());
@@ -39,55 +58,68 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
     }
   }, [type, tempCoupon]);//只要 type 或 tempCoupon 發生變化，就會重新執行這段邏輯。
 
-  const handleChange = (e) => { //使用者輸入內容時觸發onChange事件，呼叫handleChange(e)，從 e.target 抓到輸入欄位的 name 和 value，用setTempData更新對應欄位
-    const { value, name } = e.target; //從e.target中解構出name屬性(欄位名稱)跟value(值)
-    if (['price', 'origin_price', 'percent'].includes(name)) { //如果name屬性裡面包含到價格，要先轉成數字型別
-      if (isNaN(value) || value.trim() === "") return; // 若不是數字或為空字串就不更新
-      setTempData({
-        ...tempData,
-        [name]: Number(value)//轉換成數字型別
-      });
-    } else if (name === 'is_enabled') {
-      setTempData({
-        ...tempData,
-        [name]: +e.target.checked,//e.target.checked是布林值，前面加上+號，將true轉成1，false轉成0
-      })
-    } else {
-      setTempData({
-        ...tempData,
-        [name]: value
-      })
-    }
-  };
+   /** 處理所有 input 變更 */
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const { name, value, checked } = e.target;
 
-  const handleSubmit = async () => {//把剛剛填進去的所有輸入資料（tempData）透過 axios 傳送到後端 API
+  type TextField = 'title' | 'code';
+  type NumberField = 'percent';
+
+  if (name === 'is_enabled') {
+    setTempData((prev) => ({ ...prev, is_enabled: checked ? 1 : 0 }));
+    return;
+  }
+
+  if ((['percent'] as NumberField[]).includes(name as NumberField)) {
+    if (value.trim() === '' || Number.isNaN(Number(value))) return;
+    setTempData((prev) => ({ ...prev, percent: Number(value) }));
+    return;
+  }
+
+ if (name === 'title' || name === 'code') {
+  const key: 'title' | 'code' = name; // 明確窄化
+  setTempData(prev => ({ ...prev, [key]: value }));
+  return;
+}
+};
+
+
+   /** 送出表單（新增/編輯） */
+  const handleSubmit = async (): Promise<void> => {
     try {
-      let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon`
-      let method = 'post';
+      // 依照 create/edit 決定 API 與 method
+      let url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon`;
+      let method: Extract<Method, 'post' | 'put'> = 'post';
+
       if (type === 'edit') {
-        api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${tempCoupon.id}`;
+        url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${tempCoupon.id}`;
         method = 'put';
-      }//執行handleSubmit的時候他會先確認是要新增還是編輯，進而變更串接api的方式
-      const res = await axios[method](
-        api,
-        {
-          data: {
-            ...tempData,
-            due_date: date.getTime(),//把我用newDate儲存的資料轉換成unix timestamp
-          },
-        });//此api要求把資料包在一個 data 欄位裡，而tempData必須是個物件
+      }
+
+      // 後端需要「秒」，Date.getTime() 是「毫秒」→ 要除以 1000
+      const payload: Coupon = {
+        ...tempData,
+        due_date: Math.floor(date.getTime() / 1000),
+      };
+
+      const config: AxiosRequestConfig = {
+        url,
+        method,
+        data: { data: payload }, // 該 API 要包 { data: {...} }
+      };
+
+      const res = await axios.request(config);
 
       handleSuccessMessage(dispatch, res);
-      closeModal();//handleSubmit之後關閉modal
-      getCoupons();//並重新取得遠端資料
-    } catch (error) {
-
+      closeModal();
+      getCoupons();
+    } catch (error: unknown) {
       handleErrorMessage(dispatch, error);
     }
   };
 
   return (
-    <div className="modal fade" id="productModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className="modal fade" id="productModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">

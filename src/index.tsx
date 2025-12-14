@@ -6,12 +6,13 @@ import reportWebVitals from './reportWebVitals';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // ← 正確的 JS 載入方式
 import { ToastProvider } from './context/toastContext';
-
 import axios from 'axios';
+
+
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root')!);//非空斷言 (Non-null Assertion)
 root.render(
   <React.StrictMode>
     <HashRouter>

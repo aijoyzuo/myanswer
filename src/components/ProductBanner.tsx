@@ -1,5 +1,11 @@
-// components/ProductBanner.jsx
-export default function ProductBanner({ showFallback, setShowFallback }) {
+// components/ProductBanner.tsx
+
+type ProductBannerProps = {
+  showFallback:boolean;
+  setShowFallback: React.Dispatch<React.SetStateAction<boolean>>; 
+};
+
+export default function ProductBanner({ showFallback, setShowFallback }:ProductBannerProps):JSX.Element {
   return (
     <div className="position-relative overflow-hidden d-none d-md-block" style={{ height: "350px" }}>
       <div

@@ -1,115 +1,173 @@
-import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { MessageContext, handleSuccessMessage, handleErrorMessage } from "../context/messageContext";
+import React, { useEffect, useState } from 'react';
+import axios, { AxiosRequestConfig, Method } from 'axios';
+import { useMessage, handleSuccessMessage, handleErrorMessage } from '../context/messageContext';
 
-export default function ProductModal({ closeProductModal, getProducts, type, tempProduct }) {
-  const [tempData, setTempData] = useState({
-    title: "",
-    category: "",
+/** 商品資料型別（可依實際 API 擴充） */
+export type Product = {
+  id?: string | number;
+  title: string;
+  category: string;
+  origin_price: number;
+  price: number;
+  unit: string;
+  description: string;
+  content: string;
+  is_enabled: 0 | 1;
+  imageUrl: string;
+  imagesUrl: string[]; // 多圖（後端有些寫 imagesUrl）
+};
+
+/** 元件 props 型別 */
+type ProductModalProps = {
+  closeProductModal: () => void;
+  getProducts: () => void;
+  type: 'create' | 'edit';
+  tempProduct: Product;
+};
+
+export default function ProductModal({
+  closeProductModal,
+  getProducts,
+  type,
+  tempProduct,
+}: ProductModalProps): JSX.Element {
+  // 用完整 Product 型別管理表單狀態
+  const [tempData, setTempData] = useState<Product>({
+    title: '',
+    category: '',
     origin_price: 100,
     price: 300,
-    unit: "個",
-    description: "",
-    content: "這是內容",
+    unit: '個',
+    description: '',
+    content: '這是內容',
     is_enabled: 1,
-    imageUrl: "",
+    imageUrl: '',
     imagesUrl: [],
   });
 
-  const [, dispatch] = useContext(MessageContext);
+  // ✅ 用物件格式拿到 dispatch（如果有需要也可取 state）
+  const { dispatch } = useMessage();
 
   useEffect(() => {
-    if (type === "create") {
+    if (type === 'create') {
       setTempData({
-        title: "",
-        category: "",
+        title: '',
+        category: '',
         origin_price: 100,
         price: 300,
-        unit: "個",
-        description: "",
-        content: "這是內容",
+        unit: '個',
+        description: '',
+        content: '這是內容',
         is_enabled: 1,
-        imageUrl: "",
+        imageUrl: '',
         imagesUrl: [],
       });
-    } else if (type === "edit") {
-      setTempData(tempProduct);
+    } else if (type === 'edit') {
+      // 確保 imagesUrl 至少是陣列
+      setTempData({
+        ...tempProduct,
+        imagesUrl: Array.isArray(tempProduct.imagesUrl) ? tempProduct.imagesUrl : [],
+      });
     }
   }, [type, tempProduct]);
 
-  const handleChange = (e) => {
-    const { value, name, checked } = e.target;
-    if (["price", "origin_price"].includes(name)) {
-      setTempData((prev) => ({ ...prev, [name]: Number(value) }));
-    } else if (name === "is_enabled") {
-      setTempData((prev) => ({ ...prev, [name]: +checked }));
-    } else {
-      setTempData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
+  /** 文字、數字、checkbox、textarea 的共用處理 */
+ const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
+  // 用 currentTarget，型別比較準；先不要解構 checked
+  const { name, value, type } = e.currentTarget;
 
-  const handleSubmit = async () => {
+  // 1) checkbox（is_enabled）
+  if (name === 'is_enabled' && type === 'checkbox') {
+    const checked = (e.currentTarget as HTMLInputElement).checked; // 這裡才取 checked
+    setTempData(prev => ({ ...prev, is_enabled: checked ? 1 : 0 }));
+    return;
+  }
+
+  // 2) 數字欄位
+  if (name === 'price' || name === 'origin_price') {
+    setTempData(prev => ({ ...prev, [name]: Number(value) } as Product));
+    return;
+  }
+
+  // 3) 其他字串欄位
+  setTempData(prev => ({ ...prev, [name]: value } as Product));
+};
+
+
+  /** 送出表單（新增/編輯） */
+  const handleSubmit = async (): Promise<void> => {
     try {
-      let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product`;
-      let method = "post";
-      if (type === "edit") {
-        api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product/${tempProduct.id}`;
-        method = "put";
+      let url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product`;
+      let method: Extract<Method, 'post' | 'put'> = 'post';
+
+      if (type === 'edit') {
+        url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product/${tempProduct.id}`;
+        method = 'put';
       }
-      const res = await axios[method](api, { data: tempData });
+
+      const config: AxiosRequestConfig = {
+        url,
+        method,
+        data: { data: tempData },
+      };
+
+      const res = await axios.request(config);
 
       handleSuccessMessage(dispatch, res);
       closeProductModal();
       getProducts();
-    } catch (error) {
+    } catch (error: unknown) {
       handleErrorMessage(dispatch, error);
-      //console.error正式環境不輸出：
-      if (process.env.NODE_ENV !== "production") console.error(error);
+      if (process.env.NODE_ENV !== 'production') console.error(error);
     }
   };
 
-  const [tempImage, setTempImage] = useState("");
+  const [tempImage, setTempImage] = useState<string>('');
 
-  const handleUpload = async (file, which = "main") => {
+  /** 上傳主圖/副圖 */
+  const handleUpload = async (file: File | undefined, which: 'main' | 'sub' = 'main'): Promise<void> => {
     if (!file) return;
+
     const formData = new FormData();
-    formData.append("file-to-upload", file);
+    formData.append('file-to-upload', file);
 
     try {
       const res = await axios.post(
         `/v2/api/${process.env.REACT_APP_API_PATH}/admin/upload`,
         formData
       );
-      if (res.data.success) {
-        if (which === "main") {
-          setTempData((prev) => ({ ...prev, imageUrl: res.data.imageUrl }));
+
+      if (res.data?.success) {
+        const url = res.data.imageUrl as string;
+        if (which === 'main') {
+          setTempData((prev) => ({ ...prev, imageUrl: url }));
         } else {
           setTempData((prev) => ({
             ...prev,
-            imagesUrl: [...(prev.imagesUrl || []), res.data.imageUrl],
+            imagesUrl: [...(prev.imagesUrl || []), url],
           }));
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       handleErrorMessage(dispatch, error);
-      if (process.env.NODE_ENV !== "production") console.error(error);
+      if (process.env.NODE_ENV !== 'production') console.error(error);
     }
   };
 
-  // 元件本體的 return
   return (
-    <div className="modal fade" id="productModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className="modal fade" id="productModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
             <h2 className="modal-title fs-5" id="exampleModalLabel">
-              {type === "create" ? "建立新商品" : `編輯${tempData.title}`}
+              {type === 'create' ? '建立新商品' : `編輯 ${tempData.title}`}
             </h2>
             <button type="button" className="btn-close" aria-label="Close" onClick={closeProductModal} />
           </div>
 
           <div className="modal-body">
             <div className="row">
+              {/* 左：圖片區 */}
               <div className="col-sm-4">
                 <div className="form-group mb-2">
                   <label className="w-100" htmlFor="image">
@@ -133,7 +191,7 @@ export default function ProductModal({ closeProductModal, getProducts, type, tem
                       type="file"
                       id="customFile"
                       className="form-control"
-                      onChange={(e) => handleUpload(e.target.files[0], "main")}
+                      onChange={(e) => handleUpload(e.target.files?.[0], 'main')}
                     />
                   </label>
                 </div>
@@ -162,7 +220,7 @@ export default function ProductModal({ closeProductModal, getProducts, type, tem
                             ...prev,
                             imagesUrl: [...(prev.imagesUrl || []), tempImage],
                           }));
-                          setTempImage("");
+                          setTempImage('');
                         }}
                       >
                         新增
@@ -177,7 +235,7 @@ export default function ProductModal({ closeProductModal, getProducts, type, tem
                         type="file"
                         id="customFileSub"
                         className="form-control"
-                        onChange={(e) => handleUpload(e.target.files[0], "sub")}
+                        onChange={(e) => handleUpload(e.target.files?.[0], 'sub')}
                       />
                     </label>
                   </div>
@@ -190,7 +248,7 @@ export default function ProductModal({ closeProductModal, getProducts, type, tem
                       <button
                         type="button"
                         className="btn btn-sm btn-danger position-absolute"
-                        style={{ top: "10px", right: "10px" }}
+                        style={{ top: '10px', right: '10px' }}
                         onClick={() => {
                           setTempData((prev) => ({
                             ...prev,
@@ -204,6 +262,7 @@ export default function ProductModal({ closeProductModal, getProducts, type, tem
                   ))}
               </div>
 
+              {/* 右：表單欄位 */}
               <div className="col-sm-8">
                 <div className="form-group mb-2">
                   <label className="w-100" htmlFor="title">
@@ -240,7 +299,7 @@ export default function ProductModal({ closeProductModal, getProducts, type, tem
                     <label className="w-100" htmlFor="unit">
                       單位
                       <input
-                        type="text"            // 原本寫成 type="unit" 不是合法型別
+                        type="text"
                         id="unit"
                         name="unit"
                         placeholder="請輸入單位"

@@ -1,4 +1,12 @@
-export default function Carousel({ isActive, img, text, author, alt }) {
+type CarouselProps = {
+  isActive: boolean;
+  img: string;
+  text: string;
+  author: string;
+  alt?: string;  // 可選，因為有時候圖片可能沒傳 alt
+};
+
+export default function Carousel({ isActive, img, text, author, alt }: CarouselProps):JSX.Element {
   return (<>
     <div className={`carousel-item ${isActive ? 'active' : ''}`}>
       <div className="row justify-content-center py-5">

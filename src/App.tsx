@@ -16,7 +16,7 @@ import WishList from './pages/front/WishList';
 import Services from './pages/front/Services';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-function App() {
+function App(): JSX.Element {
 
   return (
     <div>

@@ -1,4 +1,19 @@
-export default function Pagination({ pagination, changePage }) { //在這裡把getProducts改名為changePage以免混淆，┬但呼叫的仍是getProducts
+/** 後端回傳的分頁結構 */
+export type PaginationData = {
+  total_pages: number;
+  current_page: number;
+  has_pre: boolean;
+  has_next: boolean;
+};
+
+/** 元件 props 型別 */
+type PaginationProps = {
+  pagination: PaginationData | null;
+  changePage: (params: { page: number }) => void;
+};
+
+
+export default function Pagination({ pagination, changePage }: PaginationProps): JSX.Element | null  { //在這裡把getProducts改名為changePage以免混淆，┬但呼叫的仍是getProducts
   if (!pagination || !pagination.total_pages) return null;
   return (
     <nav aria-label="Page navigation example">

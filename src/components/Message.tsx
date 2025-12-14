@@ -7,11 +7,17 @@ dispatch：一個可以發送 action、改變 message 狀態的函式
 
 
 import { useContext } from "react";
-import { MessageContext } from "../context/messageContext";
+import { useMessage } from "../context/messageContext";// ← TS 版的 hook
+import type { MessageState } from '../context/messageContext';
 
-export default function Message() {
-  const [message] = useContext(MessageContext);
 
+export default function Message(): JSX.Element {
+  const { state: message, dispatch } = useMessage();
+
+  const handleClose = () => {
+    dispatch({ type: 'CLEAR_MESSAGE' });
+  };
+  
   return (
     <>
 

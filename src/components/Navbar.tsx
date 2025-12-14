@@ -1,18 +1,27 @@
 import { NavLink } from "react-router-dom";
 import { useRef } from "react";
-import { Collapse } from "bootstrap/dist/js/bootstrap.bundle.min";
+import { Collapse } from "bootstrap";
 
-export default function Navbar({ cartData }) {
-  const collapseRef = useRef(null);
+/** 只需要 carts 的長度，先最小化型別即可 */
+type CartItem = { id: string | number; [k: string]: unknown };
+type CartData = { carts?: CartItem[] };
 
-  const toggleNavbar = () => {
+type NavbarProps = {
+  cartData?: CartData;
+};
+
+
+export default function Navbar({ cartData }: NavbarProps): JSX.Element{
+  const collapseRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleNavbar = (): void => {
     if (collapseRef.current) {
       const bsCollapse = Collapse.getOrCreateInstance(collapseRef.current);
       bsCollapse.toggle(); // 這行會「自動判斷是開還是關」
     }
   };
 
-  const handleNavClick = () => {
+  const handleNavClick = (): void => {
     if (window.innerWidth < 768 && collapseRef.current) { //collapseRef.current：確保 ref 真的有抓到 <div className="collapse navbar-collapse" id="navbarNav"> 這個 DOM 元素。
       // useRef(null) 創建一個物件，裡面有一個 .current 屬性，初始值是 null。
       //把這個 collapseRef 綁定（ref={collapseRef}）到某個 JSX 元素上後，React 會自動把該元素的 DOM 節點指派給 collapseRef.current。
@@ -25,7 +34,7 @@ export default function Navbar({ cartData }) {
     }
   };
 
-  const getNavClass = ({ isActive }) =>
+  const getNavClass = ({ isActive }: { isActive: boolean }): string  =>
     'nav-link ps-0 text-decoration-none' + (isActive ? ' text-dark fw-bold' : '');
 
   return (

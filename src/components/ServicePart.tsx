@@ -1,6 +1,16 @@
 import { motion } from "framer-motion";
 
-export default function ServicePart({ img, alt, name, description, suitableFor, onReserveClick }) {
+type ServicePartProps = {
+  img: string;
+  alt:string;
+  name:string;
+  description: string;
+  suitableFor:string; 
+  onReserveClick:() => void;
+}
+
+
+export default function ServicePart({ img, alt, name, description, suitableFor, onReserveClick }: ServicePartProps): JSX.Element {
   return (
     <div className="col-md-3 mb-4 py-1">
       <motion.div

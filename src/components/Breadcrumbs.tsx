@@ -1,10 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 
-export default function Breadcrumbs() {
-  const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
-
-  const routeNameMap = {
+const routeNameMap:Record<string,string> = {
     products: "產品列表",
     product: "產品列表",
     category: "分類",
@@ -14,6 +10,14 @@ export default function Breadcrumbs() {
     wishlist: "心動清單"
   };
 
+export default function Breadcrumbs():JSX.Element {
+  const location = useLocation();
+  const pathnames:string[] = location.pathname.split("/").filter((x) => x);
+
+   const isProductDetail =
+    pathnames.length === 2 && pathnames[0] === "product";  
+  
+
   return (
     <nav aria-label="breadcrumb" className="my-3">
       <ol className="breadcrumb mb-0">
@@ -21,7 +25,7 @@ export default function Breadcrumbs() {
           <Link to="/">首頁</Link>
         </li>
 
-        {pathnames.length === 2 && pathnames[0] === "product" ? (
+        {isProductDetail? (
           <>
             <li className="breadcrumb-item">
               <Link to="/products">產品列表</Link>

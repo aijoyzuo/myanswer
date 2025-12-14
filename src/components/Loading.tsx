@@ -1,5 +1,10 @@
 import BeatLoader from "react-spinners/BeatLoader";
-export default function Loading({ isLoading }) {
+
+type LoadingProps={
+  isLoading:boolean;
+}
+
+export default function Loading({ isLoading }:LoadingProps):JSX.Element {
   return (<>
     {isLoading && (
       <div style={{
@@ -9,7 +14,7 @@ export default function Loading({ isLoading }) {
         left: 0,
         right: 0,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: "10",
+        zIndex: 10,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

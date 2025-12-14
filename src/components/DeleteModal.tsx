@@ -1,9 +1,16 @@
-export default function DeleteModal({ onClose, text, handleDelete, id }) {
+type DeleteModalProps = {
+  onClose: () => void;
+    text: string;
+   handleDelete: (id: string | number) => void;
+    id: string | number;
+};
+
+export default function DeleteModal({ onClose, text, handleDelete, id }:DeleteModalProps):JSX.Element {
   return (
     <div
       className='modal fade'
-      tabIndex='-1'
-      id='deleteModal'//記得加上ID
+      tabIndex={-1}
+      id='deleteModal'
       aria-labelledby='exampleModalLabel'
       aria-hidden='true'
     >
