@@ -1,33 +1,51 @@
-import { FieldErrors, FieldValues, UseFormRegister } from 'react-hook-form'
+import type {
+  FieldErrors,
+  FieldValues,
+  Path,
+  RegisterOptions,
+  UseFormRegister,
+} from "react-hook-form";
 
-type InputProps = {
-  id: string;
+type InputProps<TFieldValues extends FieldValues> = {
+  id: Path<TFieldValues>;
   labelText: string;
-  type?: string;
-  rules?: object;
-  register: UseFormRegister<FieldValues>;
-  errors: FieldErrors;
-  placeholder: string;
+  type?: React.HTMLInputTypeAttribute;
+  placeholder?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+
+  register: UseFormRegister<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
+  rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
 };
 
-export const Input:React.FC<InputProps> = ({ id, labelText, register, type, errors, rules, placeholder }) => {
+export function Input<TFieldValues extends FieldValues>({
+  id,
+  labelText,
+  type = "text",
+  placeholder,
+  inputMode,
+  register,
+  errors,
+  rules,
+}: InputProps<TFieldValues>): JSX.Element {
+  const errorMsg = errors?.[id]?.message as string | undefined;
+
   return (
-    <>
-      <label htmlFor={id} className='form-label'>
+    <div>
+      <label htmlFor={id} className="form-label">
         {labelText}
       </label>
+
       <input
         id={id}
         type={type}
         placeholder={placeholder}
-        className={`form-control ${errors[id] && 'is-invalid'}`}
+        inputMode={inputMode}
+        className={`form-control ${errorMsg ? "is-invalid" : ""}`}
         {...register(id, rules)}
       />
-      {errors[id] && (
-        <div className='invalid-feedback'>{errors[id]?.message as string}</div>
-      )}
-    </>
+
+      {errorMsg && <div className="invalid-feedback">{errorMsg}</div>}
+    </div>
   );
-};
-
-
+}

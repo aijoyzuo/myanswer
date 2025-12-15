@@ -17,18 +17,18 @@ type Props = {
   closeModal: () => void;
   getCoupons: () => void;
   type: 'create' | 'edit';
-  tempCoupon: Coupon;
+  tempCoupon?: Partial<Coupon>;
 };
 
 /** 將 Date 轉為 <input type="date"> 需要的 yyyy-MM-dd */
-const formatDateForInput = (date:Date):string => {
+const formatDateForInput = (date: Date): string => {
   const yyyy = date.getFullYear();
   const mm = (date.getMonth() + 1).toString().padStart(2, "0");
   const dd = date.getDate().toString().padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }:Props) {
+export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }: Props) {
   const [tempData, setTempData] = useState<Coupon>({
     title: "超優惠",
     is_enabled: 1,
@@ -36,7 +36,7 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
     due_date: 1555459200,
     code: 'testCode',
   });
-  const { dispatch} = useMessage();
+  const { dispatch } = useMessage();
 
   //把input輸入的時間格式(2025-04-25)經過轉成new Date再轉成api的時間格式(unix timestamp)
   const [date, setDate] = useState(new Date());
@@ -52,48 +52,63 @@ export default function CouponModal({ closeModal, getCoupons, type, tempCoupon }
         code: 'testCode',
       });
       setDate(new Date());//在編輯時抓到最後一次設定的時間
-    } else if (type === 'edit') {
-      setTempData(tempCoupon);
-      setDate(new Date(tempCoupon.due_date * 1000));//在編輯時抓到該優惠券原設定的時間
+    } else if (type === "edit") {
+      setTempData((prev) => ({
+        ...prev,
+        ...tempCoupon,
+        // 保底，避免 title/code/percent 不存在
+        title: tempCoupon?.title ?? "",
+        code: tempCoupon?.code ?? "",
+        percent: tempCoupon?.percent ?? prev.percent,
+        is_enabled: (tempCoupon?.is_enabled ?? 0) as 0 | 1,
+        due_date: tempCoupon?.due_date ?? prev.due_date,
+      }));
+
+      const due = tempCoupon?.due_date;
+      setDate(due ? new Date(due * 1000) : new Date());
     }
   }, [type, tempCoupon]);//只要 type 或 tempCoupon 發生變化，就會重新執行這段邏輯。
 
-   /** 處理所有 input 變更 */
+  /** 處理所有 input 變更 */
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-  const { name, value, checked } = e.target;
+    const { name, value, checked } = e.target;
 
-  type TextField = 'title' | 'code';
-  type NumberField = 'percent';
+    type TextField = 'title' | 'code';
+    type NumberField = 'percent';
 
-  if (name === 'is_enabled') {
-    setTempData((prev) => ({ ...prev, is_enabled: checked ? 1 : 0 }));
-    return;
-  }
+    if (name === 'is_enabled') {
+      setTempData((prev) => ({ ...prev, is_enabled: checked ? 1 : 0 }));
+      return;
+    }
 
-  if ((['percent'] as NumberField[]).includes(name as NumberField)) {
-    if (value.trim() === '' || Number.isNaN(Number(value))) return;
-    setTempData((prev) => ({ ...prev, percent: Number(value) }));
-    return;
-  }
+    if ((['percent'] as NumberField[]).includes(name as NumberField)) {
+      if (value.trim() === '' || Number.isNaN(Number(value))) return;
+      setTempData((prev) => ({ ...prev, percent: Number(value) }));
+      return;
+    }
 
- if (name === 'title' || name === 'code') {
-  const key: 'title' | 'code' = name; // 明確窄化
-  setTempData(prev => ({ ...prev, [key]: value }));
-  return;
-}
-};
+    if (name === 'title' || name === 'code') {
+      const key: 'title' | 'code' = name; // 明確窄化
+      setTempData(prev => ({ ...prev, [key]: value }));
+      return;
+    }
+  };
 
 
-   /** 送出表單（新增/編輯） */
+  /** 送出表單（新增/編輯） */
   const handleSubmit = async (): Promise<void> => {
     try {
       // 依照 create/edit 決定 API 與 method
       let url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon`;
       let method: Extract<Method, 'post' | 'put'> = 'post';
 
-      if (type === 'edit') {
+      if (type === "edit") {
+        if (!tempCoupon?.id) {
+          handleErrorMessage(dispatch, { message: "缺少優惠券 id，無法編輯" });
+          return;
+        }
         url = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/coupon/${tempCoupon.id}`;
-        method = 'put';
+        method = "put";
       }
 
       // 後端需要「秒」，Date.getTime() 是「毫秒」→ 要除以 1000

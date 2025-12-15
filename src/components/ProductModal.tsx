@@ -2,6 +2,21 @@ import React, { useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig, Method } from 'axios';
 import { useMessage, handleSuccessMessage, handleErrorMessage } from '../context/messageContext';
 
+const defaultProduct: Product = {
+  title: "",
+  category: "",
+  origin_price: 100,
+  price: 300,
+  unit: "個",
+  description: "",
+  content: "這是內容",
+  is_enabled: 1,
+  imageUrl: "",
+  imagesUrl: [],
+};
+
+
+
 /** 商品資料型別（可依實際 API 擴充） */
 export type Product = {
   id?: string | number;
@@ -20,9 +35,9 @@ export type Product = {
 /** 元件 props 型別 */
 type ProductModalProps = {
   closeProductModal: () => void;
-  getProducts: () => void;
+ getProducts: (page?: number) => Promise<void>;
   type: 'create' | 'edit';
-  tempProduct: Product;
+   tempProduct: Partial<Product>; 
 };
 
 export default function ProductModal({
@@ -32,44 +47,23 @@ export default function ProductModal({
   tempProduct,
 }: ProductModalProps): JSX.Element {
   // 用完整 Product 型別管理表單狀態
-  const [tempData, setTempData] = useState<Product>({
-    title: '',
-    category: '',
-    origin_price: 100,
-    price: 300,
-    unit: '個',
-    description: '',
-    content: '這是內容',
-    is_enabled: 1,
-    imageUrl: '',
-    imagesUrl: [],
-  });
+  const [tempData, setTempData] = useState<Product>(defaultProduct);
 
   // ✅ 用物件格式拿到 dispatch（如果有需要也可取 state）
   const { dispatch } = useMessage();
 
   useEffect(() => {
-    if (type === 'create') {
-      setTempData({
-        title: '',
-        category: '',
-        origin_price: 100,
-        price: 300,
-        unit: '個',
-        description: '',
-        content: '這是內容',
-        is_enabled: 1,
-        imageUrl: '',
-        imagesUrl: [],
-      });
-    } else if (type === 'edit') {
-      // 確保 imagesUrl 至少是陣列
-      setTempData({
-        ...tempProduct,
-        imagesUrl: Array.isArray(tempProduct.imagesUrl) ? tempProduct.imagesUrl : [],
-      });
-    }
-  }, [type, tempProduct]);
+  if (type === "create") {
+    setTempData(defaultProduct);
+  } else {
+    setTempData({
+      ...defaultProduct,
+      ...tempProduct,
+      imagesUrl: Array.isArray(tempProduct.imagesUrl) ? tempProduct.imagesUrl : [],
+    });
+  }
+}, [type, tempProduct]);
+
 
   /** 文字、數字、checkbox、textarea 的共用處理 */
  const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {

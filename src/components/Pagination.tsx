@@ -9,26 +9,27 @@ export type PaginationData = {
 /** 元件 props 型別 */
 type PaginationProps = {
   pagination: PaginationData | null;
-  changePage: (params: { page: number }) => void;
+  changePage: (page: number) => void;
 };
 
+export default function Pagination({
+  pagination,
+  changePage,
+}: PaginationProps): JSX.Element | null {
+  if (!pagination || pagination.total_pages <= 1) return null;
 
-export default function Pagination({ pagination, changePage }: PaginationProps): JSX.Element | null  { //在這裡把getProducts改名為changePage以免混淆，┬但呼叫的仍是getProducts
-  if (!pagination || !pagination.total_pages) return null;
   return (
     <nav aria-label="Page navigation example">
       <ul className="pagination">
         {/* 上一頁 */}
-        <li className={`page-item ${!pagination.has_pre ? 'disabled' : ''}`}>
+        <li className={`page-item ${!pagination.has_pre ? "disabled" : ""}`}>
           <a
             className="page-link"
             href="/"
             aria-label="Previous"
             onClick={(e) => {
               e.preventDefault();
-              if (pagination.has_pre) {
-                changePage({ page: pagination.current_page - 1 });
-              }
+              if (pagination.has_pre) changePage(pagination.current_page - 1);
             }}
           >
             <span aria-hidden="true">&laquo;</span>
@@ -36,35 +37,38 @@ export default function Pagination({ pagination, changePage }: PaginationProps):
         </li>
 
         {/* 頁碼清單 */}
-        {Array.from({ length: pagination.total_pages }, (_, i) => (
-          <li
-            className={`page-item ${pagination.current_page === i + 1 ? 'active' : ''}`}
-            key={`page_${i + 1}`}
-          >
-            <a
-              className="page-link"
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                changePage({ page: i + 1 });
-              }}
+        {Array.from({ length: pagination.total_pages }, (_, i) => {
+          const page = i + 1;
+          return (
+            <li
+              className={`page-item ${
+                pagination.current_page === page ? "active" : ""
+              }`}
+              key={`page_${page}`}
             >
-              {i + 1}
-            </a>
-          </li>
-        ))}
+              <a
+                className="page-link"
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  changePage(page);
+                }}
+              >
+                {page}
+              </a>
+            </li>
+          );
+        })}
 
         {/* 下一頁 */}
-        <li className={`page-item ${!pagination.has_next ? 'disabled' : ''}`}>
+        <li className={`page-item ${!pagination.has_next ? "disabled" : ""}`}>
           <a
             className="page-link"
             href="/"
             aria-label="Next"
             onClick={(e) => {
               e.preventDefault();
-              if (pagination.has_next) {
-                changePage({ page: pagination.current_page + 1 });
-              }
+              if (pagination.has_next) changePage(pagination.current_page + 1);
             }}
           >
             <span aria-hidden="true">&raquo;</span>

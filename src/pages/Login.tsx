@@ -1,46 +1,63 @@
-// 用 form 的 onSubmit 讓按 Enter 可送出表單
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+type LoginForm = {
+  username: string;
+  password: string;
+};
+
+type ApiErrorData = {
+  message?: string;
+  [key: string]: unknown;
+};
+
+type SignInResponse = {
+  token: string;
+  expired: number | string; // 有些後端是 timestamp，有些是字串
+  success: boolean;
+  message?: string;
+};
+
+export default function Login(): JSX.Element {
   const navigate = useNavigate();
 
-  const [data, setData] = useState({
+  const [data, setData] = useState<LoginForm>({
     username: "",
     password: "",
   });
 
-  // 只在錯誤時有值：{ message, ... }
-  const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<ApiErrorData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
-    // 使用者輸入時清掉舊錯誤
+    setData((prev) => ({ ...prev, [name]: value } as LoginForm));
     if (error) setError(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // 避免表單刷新
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const res = await axios.post("/v2/admin/signin", data);
+      const res = await axios.post<SignInResponse>("/v2/admin/signin", data);
       const { token, expired, success } = res.data;
 
-      // 將 token 存入 cookie（標準 UTC 格式）
-      document.cookie = `answerToken=${token}; expires=${new Date(expired).toUTCString()}; path=/`;
+      document.cookie = `answerToken=${token}; expires=${new Date(
+        expired
+      ).toUTCString()}; path=/`;
 
       if (success) {
-        axios.defaults.headers.common["Authorization"] = token; // 全域帶 token
+        axios.defaults.headers.common["Authorization"] = token;
         navigate("/admin/products");
+      } else {
+        setError({ message: res.data.message ?? "登入失敗" });
       }
-    } catch (err) {
-      // 後端常見錯誤格式：{ message: "..." }
-      setError(err?.response?.data ?? { message: "登入失敗，請稍後再試" });
+    } catch (err: unknown) {
+      const axErr = err as AxiosError<ApiErrorData>;
+      setError(axErr.response?.data ?? { message: "登入失敗，請稍後再試" });
     } finally {
       setIsSubmitting(false);
     }

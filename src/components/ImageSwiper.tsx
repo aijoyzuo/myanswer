@@ -1,4 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Navigation  } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation'; 
@@ -8,7 +9,6 @@ type ImageSwiperProps = {
   images?: string[];
 };
 
-import { Pagination, Navigation  } from 'swiper/modules';
 
 export default function ImageSwiper({ images = [] }:ImageSwiperProps):JSX.Element {
   return (
